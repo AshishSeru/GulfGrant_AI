@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GulfGrant AI</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#1E2761;--teal:#0D9488;--teal-dk:#0F766E;--teal-lt:#CCFBF1;--bg:#F1F5F9;--white:#fff;--border:#E2E8F0;--text:#1E293B;--muted:#64748B;--red:#DC2626;--red-lt:#FEE2E2;--green:#16A34A;--green-lt:#DCFCE7;--r:12px}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;line-height:1.6}
+.wrap{max-width:1160px;margin:0 auto;padding:0 1.25rem;width:100%}
+header{background:var(--navy);position:sticky;top:0;z-index:50}
+.hd{display:flex;align-items:center;justify-content:space-between;height:62px;gap:1rem}
+.brand{display:flex;align-items:center;gap:11px}
+.bi{width:36px;height:36px;background:var(--teal);border-radius:8px;color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bn{color:#fff;font-size:1.05rem;font-weight:700;display:block;line-height:1.2}
+.bt{color:#94A3B8;font-size:.73rem;display:block}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.lsw{display:flex;border:1px solid #334155;border-radius:7px;overflow:hidden}
+.lb{background:transparent;border:none;color:#94A3B8;font-size:.82rem;font-weight:600;padding:5px 12px;cursor:pointer;font-family:inherit}
+.lb.on{background:var(--teal);color:#fff}
+.key-btn{font-size:.75rem;padding:4px 10px;border-radius:6px;cursor:pointer;border:1px solid;white-space:nowrap;font-family:inherit}
+.key-btn.unset{background:var(--red-lt);color:var(--red);border-color:#FCA5A5}
+.key-btn.set{background:var(--green-lt);color:var(--green);border-color:#86EFAC}
+.hero{margin:1.75rem 0 1.25rem;text-align:center}
+.hero p{color:var(--muted);font-size:.98rem;max-width:570px;margin:0 auto}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--r);padding:1.5rem;width:420px;max-width:90vw}
+.modal h3{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:.5rem}
+.modal p{font-size:.84rem;color:var(--muted);margin-bottom:1rem;line-height:1.5}
+.modal input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;margin-bottom:.75rem}
+.modal input:focus{outline:none;border-color:var(--teal)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.btn-save{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-cancel{background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-size:.88rem;cursor:pointer;font-family:inherit}
+.tabs{display:flex;gap:8px;margin-bottom:1.2rem;flex-wrap:wrap}
+.tab{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:8px 18px;font-size:.88rem;font-weight:500;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit}
+.tab.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.panel{display:none}
+.panel.on{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.fc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;display:flex;flex-direction:column;gap:.95rem}
+.fc h2{font-size:.98rem;font-weight:700;color:var(--navy)}
+.fd{font-size:.83rem;color:var(--muted);margin-top:-4px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+input[type=text],textarea,select{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:.88rem;color:var(--text);background:#FAFBFC;font-family:inherit;resize:vertical}
+input[type=text]:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);background:#fff}
+.field-err{font-size:.76rem;color:var(--red);display:none;margin-top:2px}
+.show-err{display:block}
+.input-err{border-color:var(--red)}
+.char-count{font-size:.73rem;color:var(--muted);text-align:right}
+.btn-gen{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:11px;font-size:.92rem;font-weight:600;cursor:pointer;width:100%;font-family:inherit;margin-top:2px}
+.btn-gen:hover{background:var(--teal-dk)}
+.btn-gen:disabled{background:#94A3B8;cursor:not-allowed}
+.err-banner{display:none;background:var(--red-lt);border:1px solid #FCA5A5;border-radius:8px;padding:.7rem 1rem;font-size:.84rem;color:var(--red);margin-top:4px}
+.err-banner.show{display:block}
+.oc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);min-height:360px;display:flex;flex-direction:column}
+.oe{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:2rem;color:var(--muted)}
+.oi{font-size:2.2rem}
+.oe p{font-size:.88rem;text-align:center}
+.ol{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);font-size:.88rem}
+.pbar-wrap{width:200px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.pbar{height:100%;background:var(--teal);border-radius:2px;animation:prog 8s ease-in-out forwards}
+@keyframes prog{0%{width:0}80%{width:85%}100%{width:85%}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .75s linear infinite}
+.or{flex:1;display:none;flex-direction:column}
+.rh{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--border);background:#F8FAFC;border-radius:var(--r) var(--r) 0 0;flex-wrap:wrap;gap:6px}
+.rh-l{display:flex;align-items:center;gap:8px}
+.rh-r{display:flex;align-items:center;gap:6px}
+.rl{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.bc{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:inherit}
+.bc.cp{background:var(--teal-lt);border-color:var(--teal);color:var(--teal)}
+.btn-regen{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:inherit}
+.fb{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 7px;font-size:.78rem;cursor:pointer}
+.fb.fb-up.on{background:var(--green-lt);border-color:#86EFAC}
+.fb.fb-dn.on{background:var(--red-lt);border-color:#FCA5A5}
+.rt{padding:1.1rem 1.25rem;font-size:.88rem;line-height:1.8;color:var(--text);white-space:pre-wrap;flex:1;overflow-y:auto}
+.rt[dir=rtl]{font-size:.96rem;text-align:right}
+body.rtl{direction:rtl}
+body.rtl .hd,body.rtl .brand,body.rtl .tabs,body.rtl .rh,body.rtl .rh-l,body.rtl .rh-r{flex-direction:row-reverse}
+body.rtl label{text-align:right}
+footer{margin-top:auto;padding:1rem 0;border-top:1px solid var(--border)}
+footer p{color:var(--muted);font-size:.77rem;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="modal-overlay" id="key-modal">
+  <div class="modal">
+    <h3>OpenAI API Key</h3>
+    <p>Your key is stored in this browser session only. It is never saved to disk or sent anywhere except directly to OpenAI.</p>
+    <input type="password" id="key-input" placeholder="sk-..." autocomplete="off"/>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveKey()">Save Key</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="wrap hd">
+    <div class="brand">
+      <div class="bi">G</div>
+      <div><span class="bn">GulfGrant AI</span><span class="bt" id="tag">AI Writing Assistant for Gulf NGOs</span></div>
+    </div>
+    <div class="hdr-right">
+      <button class="key-btn unset" id="key-btn" onclick="openModal()">&#9888; API Key Not Set</button>
+      <div class="lsw">
+        <button class="lb on" id="len" onclick="sL('en')">EN</button>
+        <button class="lb" id="lar" onclick="sL('ar')">&#1593;&#1585;</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <p id="hero">Professional grant proposals, donor emails, and social media posts &mdash; in Arabic and English &mdash; in minutes.</p>
+  </section>
+
+  <div class="tabs">
+    <button class="tab on" id="tg" onclick="sT('g')">&#128196; <span id="tlg">Grant Writing</span></button>
+    <button class="tab" id="td" onclick="sT('d')">&#128140; <span id="tld">Donor Email</span></button>
+    <button class="tab" id="ts" onclick="sT('s')">&#128241; <span id="tls">Social Media</span></button>
+  </div>
+
+  <div class="panel on" id="pg">
+    <div class="grid">
+      <div class="fc">
+        <h2 id="gh">Grant Application Writer</h2>
+        <p class="fd" id="gd">Fill in your organisation details to receive a complete, structured grant proposal.</p>
+        <div class="field"><label>Organisation name</label><input type="text" id="gn" placeholder="e.g. Oman Youth Welfare Society"/><span class="field-err" id="gn-e">This field is required.</span></div>
+        <div class="field"><label>Cause or mission</label><textarea id="gc" rows="3" placeholder="e.g. Vocational training for underprivileged youth in Muscat" oninput="cc(this,'gc-c')"></textarea><span class="char-count" id="gc-c">0 / 300</span><span class="field-err" id="gc-e">This field is required.</span></div>
+        <div class="field-row">
+          <div class="field"><label>Funding requested</label><input type="text" id="ga" placeholder="e.g. OMR 15,000"/><span class="field-err" id="ga-e">Required.</span></div>
+          <div class="field"><label>Type of funder</label><input type="text" id="gf" placeholder="e.g. Corporate CSR"/><span class="field-err" id="gf-e">Required.</span></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Tone</label><select id="gt"><option value="formal">Formal</option><option value="warm">Warm</option><option value="urgent">Urgent</option></select></div>
+          <div class="field"><label>Length</label><select id="gl"><option value="short">Short (~350w)</option><option value="medium" selected>Medium (~550w)</option><option value="long">Long (~750w)</option></select></div>
+        </div>
+        <button class="btn-gen" id="bgb" onclick="go('g')"><span id="bgl">Generate Grant Proposal</span></button>
+        <div class="err-banner" id="gerr"></div>
+      </div>
+      <div class="oc">
+        <div class="oe" id="oeg"><div class="oi">&#128196;</div><p>Your grant proposal will appear here.</p></div>
+        <div class="ol" id="olg"><div class="spin"></div><p>Writing your grant proposal...</p><div class="pbar-wrap"><div class="pbar"></div></div></div>
+        <div class="or" id="org"><div class="rh"><div class="rh-l"><span class="rl">Grant Proposal</span><button class="fb fb-up" onclick="fb(this,'g','up')">&#128077;</button><button class="fb fb-dn" onclick="fb(this,'g','dn')">&#128078;</button></div><div class="rh-r"><button class="btn-regen" onclick="go('g')">&#8635; Regenerate</button><button class="bc" id="bcg" onclick="cp('rtg','bcg')">Copy</button></div></div><div class="rt" id="rtg"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="pd">
+    <div class="grid">
+      <div class="fc">
+        <h2 id="dh">Donor Outreach Email</h2>
+        <p class="fd" id="dd">Generate a warm, personalised email to reach potential donors.</p>
+        <div class="field"><label>Organisation name</label><input type="text" id="dn" placeholder="e.g. Gulf Environmental Alliance"/><span class="field-err" id="dn-e">This field is required.</span></div>
+        <div class="field"><label>Campaign or appeal</label><textarea id="dc" rows="3" placeholder="e.g. Ramadan water wells campaign for rural Oman" oninput="cc(this,'dc-c')"></textarea><span class="char-count" id="dc-c">0 / 300</span><span class="field-err" id="dc-e">This field is required.</span></div>
+        <div class="field-row">
+          <div class="field"><label>Donor type</label><select id="dt"><option value="individual">Individual</option><option value="corporate">Corporate</option><option value="foundation">Foundation</option><option value="government">Government</option></select></div>
+          <div class="field"><label>Tone</label><select id="dtn"><option value="warm">Warm</option><option value="formal">Formal</option><option value="urgent">Urgent</option></select></div>
+        </div>
+        <button class="btn-gen" id="bdb" onclick="go('d')"><span id="bdl">Generate Donor Email</span></button>
+        <div class="err-banner" id="derr"></div>
+      </div>
+      <div class="oc">
+        <div class="oe" id="oed"><div class="oi">&#128140;</div><p>Your donor email will appear here.</p></div>
+        <div class="ol" id="old"><div class="spin"></div><p>Writing your donor email...</p><div class="pbar-wrap"><div class="pbar"></div></div></div>
+        <div class="or" id="ord"><div class="rh"><div class="rh-l"><span class="rl">Donor Email</span><button class="fb fb-up" onclick="fb(this,'d','up')">&#128077;</button><button class="fb fb-dn" onclick="fb(this,'d','dn')">&#128078;</button></div><div class="rh-r"><button class="btn-regen" onclick="go('d')">&#8635; Regenerate</button><button class="bc" id="bcd" onclick="cp('rtd','bcd')">Copy</button></div></div><div class="rt" id="rtd"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="ps">
+    <div class="grid">
+      <div class="fc">
+        <h2 id="sh">Social Media Post</h2>
+        <p class="fd" id="sd">Create platform-ready posts with hashtags to grow your reach.</p>
+        <div class="field"><label>Organisation name</label><input type="text" id="sn" placeholder="e.g. Muscat Community Foundation"/><span class="field-err" id="sn-e">This field is required.</span></div>
+        <div class="field"><label>What do you want to share?</label><textarea id="su" rows="3" placeholder="e.g. We completed 3 water wells serving 400 families in rural Oman" oninput="cc(this,'su-c')"></textarea><span class="char-count" id="su-c">0 / 300</span><span class="field-err" id="su-e">This field is required.</span></div>
+        <div class="field-row">
+          <div class="field"><label>Platform</label><select id="sp"><option value="instagram">Instagram</option><option value="linkedin">LinkedIn</option><option value="x">X (Twitter)</option><option value="facebook">Facebook</option></select></div>
+          <div class="field"><label>Tone</label><select id="stn"><option value="inspiring">Inspiring</option><option value="informative">Informative</option><option value="urgent">Urgent</option><option value="celebratory">Celebratory</option></select></div>
+        </div>
+        <button class="btn-gen" id="bsb" onclick="go('s')"><span id="bsl">Generate Social Post</span></button>
+        <div class="err-banner" id="serr"></div>
+      </div>
+      <div class="oc">
+        <div class="oe" id="oes"><div class="oi">&#128241;</div><p>Your social media post will appear here.</p></div>
+        <div class="ol" id="ols"><div class="spin"></div><p>Writing your social post...</p><div class="pbar-wrap"><div class="pbar"></div></div></div>
+        <div class="or" id="ors"><div class="rh"><div class="rh-l"><span class="rl">Social Post</span><button class="fb fb-up" onclick="fb(this,'s','up')">&#128077;</button><button class="fb fb-dn" onclick="fb(this,'s','dn')">&#128078;</button></div><div class="rh-r"><button class="btn-regen" onclick="go('s')">&#8635; Regenerate</button><button class="bc" id="bcs" onclick="cp('rts','bcs')">Copy</button></div></div><div class="rt" id="rts"></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><div class="wrap"><p>GulfGrant AI &mdash; Built for Gulf NGOs &mdash; 2026</p></div></footer>
+
+<script>
+var lang='en', apiKey='', fbLog=[];
+function el(id){return document.getElementById(id);}
+function openModal(){el('key-modal').classList.add('open');el('key-input').focus();}
+function closeModal(){el('key-modal').classList.remove('open');}
+function saveKey(){var k=el('key-input').value.trim();if(!k)return;apiKey=k;var b=el('key-btn');b.textContent='\u2713 API Key Set';b.className='key-btn set';closeModal();}
+el('key-modal').addEventListener('click',function(e){if(e.target===el('key-modal'))closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+function sL(l){lang=l;document.documentElement.lang=l;document.body.classList.toggle('rtl',l==='ar');el('len').classList.toggle('on',l==='en');el('lar').classList.toggle('on',l==='ar');}
+function sT(n){['g','d','s'].forEach(function(x){el('t'+x).classList.toggle('on',x===n);el('p'+x).classList.toggle('on',x===n);});}
+function showState(t,s){var e=el('oe'+t),l=el('ol'+t),r=el('or'+t);e.style.display='none';l.style.display='none';r.style.display='none';if(s==='e')e.style.display='flex';if(s==='l')l.style.display='flex';if(s==='r')r.style.display='flex';}
+function cc(input,cid){var len=input.value.length;var c=el(cid);c.textContent=len+' / 300';c.style.color=len>300?'#DC2626':'#64748B';}
+function validate(t){var ok=true;var fields={g:['gn','gc','ga','gf'],d:['dn','dc'],s:['sn','su']};fields[t].forEach(function(id){var inp=el(id),err=el(id+'-e');if(!inp.value.trim()){inp.classList.add('input-err');err.classList.add('show-err');ok=false;}else{inp.classList.remove('input-err');err.classList.remove('show-err');}});return ok;}
+function buildPrompt(t){
+  var ln=lang==='ar'?'Write the ENTIRE response in Arabic (Modern Standard Arabic, formal Gulf professional register). Do not include any English words.':'Write in clear, professional English.';
+  var cx='This is for a Gulf-region NGO based in Oman or the UAE. Be culturally aware, respectful of Islamic values, and reflect the community-oriented nature of Gulf civil society.';
+  if(t==='g'){var ngo=el('gn').value.trim(),cause=el('gc').value.trim(),amt=el('ga').value.trim(),funder=el('gf').value.trim(),tone=el('gt').value,len=el('gl').value;var wds={short:'approximately 350 words',medium:'approximately 550 words',long:'approximately 750 words'};return{system:'You are a senior grant writer with 15 years of experience securing funding for Gulf-region NGOs. You write compelling, specific proposals that win approval. '+ln+' '+cx,user:'Write a complete grant proposal:\n\nOrganisation: '+ngo+'\nMission: '+cause+'\nFunding requested: '+amt+'\nFunder type: '+funder+'\nTone: '+tone+'\n\nUse these sections:\n1. Executive Summary\n2. Organisation Background\n3. Problem Statement\n4. Project Description and Objectives\n5. Expected Impact and Beneficiaries\n6. Budget Overview\n7. Closing Statement\n\nLength: '+wds[len]+'. Tailored to a '+funder+'. Avoid generic language.'};}
+  if(t==='d'){var ngo=el('dn').value.trim(),camp=el('dc').value.trim(),dtype=el('dt').value,tone=el('dtn').value;return{system:'You are an expert fundraising writer for Gulf-region NGOs. You write donor emails that feel personal and human. '+ln+' '+cx,user:'Write a donor outreach email:\n\nOrganisation: '+ngo+'\nCampaign: '+camp+'\nDonor type: '+dtype+'\nTone: '+tone+'\n\nFormat:\n- Subject: [subject line]\n- Opening: warm greeting\n- Story: human impact behind the campaign\n- Ask: clear and specific\n- Closing: grateful\n- Sign-off: from the organisation\n\nLength: 260-320 words. Sound like a real person, not a template.'};}
+  if(t==='s'){var ngo=el('sn').value.trim(),upd=el('su').value.trim(),plat=el('sp').value,tone=el('stn').value;var guides={instagram:'150-220 words, 5-8 hashtags at end, emojis welcome, emotional and visual',linkedin:'120-180 words, professional, 3-5 hashtags, focus on impact and credibility',x:'Main text must be under 280 characters total including hashtags. Punchy and direct.',facebook:'100-180 words, conversational, 3-4 hashtags, warm and accessible'};return{system:'You are a social media expert for Gulf-region NGOs. You write posts that drive engagement and inspire action. '+ln+' '+cx,user:'Write a '+plat+' post:\n\nOrganisation: '+ngo+'\nContent: '+upd+'\nTone: '+tone+'\n\nPlatform guide: '+guides[plat]+'\n\nInclude: strong opening hook, core message, call to action, hashtags including #GulfNGO and #Oman or #UAE.'};}}
+function go(t){el(t+'err').classList.remove('show');if(!validate(t))return;if(!apiKey){openModal();return;}var btns={g:'bgb',d:'bdb',s:'bsb'};var btn=el(btns[t]);btn.disabled=true;showState(t,'l');callAPI(buildPrompt(t),t,btn,0);}
+function callAPI(prompt,t,btn,attempt){
+  fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'gpt-4o',max_tokens:1400,temperature:0.72,messages:[{role:'system',content:prompt.system},{role:'user',content:prompt.user}]})})
+  .then(function(r){if(r.status===429&&attempt<2){setTimeout(function(){callAPI(prompt,t,btn,attempt+1);},2000*(attempt+1));return null;}if(r.status===401){showState(t,'e');var eb=el(t+'err');eb.textContent='Invalid API key. Click the key button in the header and re-enter your key.';eb.classList.add('show');btn.disabled=false;return null;}if(!r.ok)throw new Error('Server error '+r.status);return r.json();})
+  .then(function(data){if(!data)return;var text=data.choices[0].message.content;var textEl=el('rt'+t);textEl.textContent=text;textEl.setAttribute('dir',lang==='ar'?'rtl':'ltr');showState(t,'r');el('or'+t).querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});})
+  .catch(function(err){showState(t,'e');var eb=el(t+'err');eb.textContent='Something went wrong: '+err.message+'. Please try again.';eb.classList.add('show');})
+  .finally(function(){btn.disabled=false;});}
+function fb(btn,t,dir){btn.closest('.rh-l').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');fbLog.push({type:t,dir:dir,ts:new Date().toISOString()});}
+function cp(textId,btnId){var text=el(textId).textContent;if(!text)return;var b=el(btnId);navigator.clipboard.writeText(text).then(function(){b.textContent='Copied!';b.classList.add('cp');setTimeout(function(){b.textContent='Copy';b.classList.remove('cp');},2000);});}
+</script>
+</body>
+</html>
