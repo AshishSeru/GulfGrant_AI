@@ -3,233 +3,1099 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>GulfGrant AI</title>
+<title>GulfGrant AI — Writing Assistant for Gulf NGOs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--navy:#1E2761;--teal:#0D9488;--teal-dk:#0F766E;--teal-lt:#CCFBF1;--bg:#F1F5F9;--white:#fff;--border:#E2E8F0;--text:#1E293B;--muted:#64748B;--red:#DC2626;--red-lt:#FEE2E2;--green:#16A34A;--green-lt:#DCFCE7;--r:12px}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;line-height:1.6}
-.wrap{max-width:1160px;margin:0 auto;padding:0 1.25rem;width:100%}
-header{background:var(--navy);position:sticky;top:0;z-index:50}
-.hd{display:flex;align-items:center;justify-content:space-between;height:62px;gap:1rem}
-.brand{display:flex;align-items:center;gap:11px}
-.bi{width:36px;height:36px;background:var(--teal);border-radius:8px;color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.bn{color:#fff;font-size:1.05rem;font-weight:700;display:block;line-height:1.2}
-.bt{color:#94A3B8;font-size:.73rem;display:block}
+
+:root{
+  --ink:     #0F1F14;
+  --forest:  #1A3D2B;
+  --teal:    #0C7C5F;
+  --teal-dk: #095E48;
+  --teal-lt: #D4EDE6;
+  --gold:    #B8860B;
+  --gold-lt: #FDF5DC;
+  --cream:   #F9F5EE;
+  --sand:    #EDE8DC;
+  --paper:   #FFFFFF;
+  --border:  #D9D3C5;
+  --muted:   #6E6559;
+  --red:     #B52A1D;
+  --red-lt:  #FDECEA;
+  --green:   #166534;
+  --green-lt:#DCFCE7;
+  --r:       10px;
+  --shadow-sm: 0 1px 3px rgba(15,31,20,0.07), 0 0 0 1px rgba(15,31,20,0.04);
+  --shadow:    0 3px 12px rgba(15,31,20,0.09), 0 0 0 1px rgba(15,31,20,0.04);
+}
+
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  line-height:1.6;
+}
+
+.wrap{max-width:1160px;margin:0 auto;padding:0 1.5rem;width:100%}
+
+/* ── HEADER ─────────────────────────────── */
+header{
+  background:var(--forest);
+  border-bottom:2px solid var(--teal);
+  position:sticky;top:0;z-index:100;
+}
+.hd{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  height:64px;gap:1rem;
+}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo{
+  width:40px;height:40px;flex-shrink:0;
+  background:var(--teal);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+.brand-name{
+  color:#fff;
+  font-family:'Playfair Display',serif;
+  font-size:1.15rem;font-weight:700;
+  display:block;line-height:1.2;
+  letter-spacing:.01em;
+}
+.brand-sub{
+  color:rgba(255,255,255,0.45);
+  font-size:.68rem;letter-spacing:.06em;
+  text-transform:uppercase;display:block;
+  margin-top:1px;
+}
 .hdr-right{display:flex;align-items:center;gap:10px}
-.lsw{display:flex;border:1px solid #334155;border-radius:7px;overflow:hidden}
-.lb{background:transparent;border:none;color:#94A3B8;font-size:.82rem;font-weight:600;padding:5px 12px;cursor:pointer;font-family:inherit}
+.lsw{
+  display:flex;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:7px;overflow:hidden;
+}
+.lb{
+  background:transparent;border:none;
+  color:rgba(255,255,255,0.5);
+  font-family:'DM Sans',sans-serif;
+  font-size:.82rem;font-weight:600;
+  padding:5px 14px;cursor:pointer;
+  transition:all .2s;
+}
 .lb.on{background:var(--teal);color:#fff}
-.key-btn{font-size:.75rem;padding:4px 10px;border-radius:6px;cursor:pointer;border:1px solid;white-space:nowrap;font-family:inherit}
-.key-btn.unset{background:var(--red-lt);color:var(--red);border-color:#FCA5A5}
-.key-btn.set{background:var(--green-lt);color:var(--green);border-color:#86EFAC}
-.hero{margin:1.75rem 0 1.25rem;text-align:center}
-.hero p{color:var(--muted);font-size:.98rem;max-width:570px;margin:0 auto}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:var(--white);border-radius:var(--r);padding:1.5rem;width:420px;max-width:90vw}
-.modal h3{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:.5rem}
-.modal p{font-size:.84rem;color:var(--muted);margin-bottom:1rem;line-height:1.5}
-.modal input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:.88rem;font-family:inherit;margin-bottom:.75rem}
-.modal input:focus{outline:none;border-color:var(--teal)}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end}
-.btn-save{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit}
-.btn-cancel{background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-size:.88rem;cursor:pointer;font-family:inherit}
-.tabs{display:flex;gap:8px;margin-bottom:1.2rem;flex-wrap:wrap}
-.tab{background:var(--white);border:1px solid var(--border);border-radius:9px;padding:8px 18px;font-size:.88rem;font-weight:500;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit}
-.tab.on{background:var(--teal);border-color:var(--teal);color:#fff}
+
+/* ── HERO ────────────────────────────────── */
+.hero{
+  background:var(--forest);
+  padding:3.5rem 0 3rem;
+  text-align:center;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 100%,rgba(12,124,95,0.18) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{max-width:640px;margin:0 auto;padding:0 1.5rem;position:relative}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(12,124,95,0.15);
+  border:1px solid rgba(12,124,95,0.3);
+  color:#6ECFB5;border-radius:20px;
+  padding:4px 14px;font-size:.78rem;font-weight:600;
+  letter-spacing:.04em;margin-bottom:1.25rem;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  color:#fff;font-size:2.6rem;font-weight:800;
+  line-height:1.15;margin-bottom:.9rem;
+  letter-spacing:-.02em;
+}
+.hero h1 em{
+  font-style:normal;color:#6ECFB5;
+}
+.hero p{
+  color:rgba(255,255,255,0.55);
+  font-size:1rem;max-width:480px;
+  margin:0 auto 1.75rem;
+}
+.hero-pills{
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+}
+.hero-pill{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6);
+  border-radius:20px;padding:5px 14px;
+  font-size:.78rem;font-weight:500;
+}
+
+/* ── PROFILE BAR ─────────────────────────── */
+.profile-bar{
+  background:var(--gold-lt);
+  border-bottom:1px solid #E8D5A0;
+  padding:8px 0;display:none;
+}
+.profile-bar.show{display:block}
+.pb-inner{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pb-inner span{font-size:.83rem;color:var(--gold);font-weight:500}
+.pb-inner strong{color:#6B4C00}
+.btn-clear-profile{
+  background:transparent;border:1px solid #C8860A;
+  border-radius:5px;padding:2px 10px;
+  font-size:.75rem;color:var(--gold);
+  cursor:pointer;font-family:inherit;margin-left:auto;
+}
+
+/* ── MAIN ────────────────────────────────── */
+.main-body{padding:2rem 0 3rem;flex:1}
+
+/* ── TABS ────────────────────────────────── */
+.tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:8px;padding:9px 22px;
+  font-size:.88rem;font-weight:500;
+  color:var(--muted);cursor:pointer;
+  font-family:inherit;
+  transition:all .2s;
+}
+.tab.on{
+  background:var(--teal);
+  border-color:var(--teal);color:#fff;
+}
+.tab:hover:not(.on){
+  border-color:var(--teal);color:var(--teal);
+}
 .panel{display:none}
 .panel.on{display:block}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start}
-@media(max-width:700px){.grid{grid-template-columns:1fr}}
-.fc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;display:flex;flex-direction:column;gap:.95rem}
-.fc h2{font-size:.98rem;font-weight:700;color:var(--navy)}
-.fd{font-size:.83rem;color:var(--muted);margin-top:-4px}
-.field{display:flex;flex-direction:column;gap:4px}
+
+/* ── GRID ────────────────────────────────── */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;align-items:start;
+}
+@media(max-width:780px){
+  .grid{grid-template-columns:1fr}
+  .hero h1{font-size:2rem}
+}
+
+/* ── FORM CARD ───────────────────────────── */
+.fc{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:1.75rem;
+  display:flex;flex-direction:column;gap:1.1rem;
+  box-shadow:var(--shadow);
+}
+.fc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.fc h2{
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;font-weight:700;color:var(--forest);
+}
+.fd{font-size:.83rem;color:var(--muted);line-height:1.5;margin-top:2px}
+.btn-save-profile{
+  background:var(--cream);border:1px solid var(--border);
+  border-radius:6px;padding:4px 11px;
+  font-size:.74rem;color:var(--muted);
+  cursor:pointer;font-family:inherit;
+  white-space:nowrap;flex-shrink:0;
+  transition:all .15s;margin-top:2px;
+}
+.btn-save-profile:hover{border-color:var(--teal);color:var(--teal)}
+
+.field{display:flex;flex-direction:column;gap:5px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-label{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-input[type=text],textarea,select{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:.88rem;color:var(--text);background:#FAFBFC;font-family:inherit;resize:vertical}
-input[type=text]:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal);background:#fff}
-.field-err{font-size:.76rem;color:var(--red);display:none;margin-top:2px}
+label{
+  font-size:.72rem;font-weight:600;
+  color:var(--muted);text-transform:uppercase;
+  letter-spacing:.07em;
+}
+input[type=text],textarea,select{
+  width:100%;
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  padding:9px 12px;
+  font-size:.88rem;
+  color:var(--ink);
+  background:#FDFCFA;
+  font-family:inherit;
+  transition:border-color .15s,box-shadow .15s;
+  resize:vertical;
+}
+input:focus,textarea:focus,select:focus{
+  outline:none;
+  border-color:var(--teal);
+  box-shadow:0 0 0 3px rgba(12,124,95,0.1);
+  background:#fff;
+}
+.field-err{
+  font-size:.73rem;color:var(--red);
+  display:none;margin-top:1px;
+}
 .show-err{display:block}
-.input-err{border-color:var(--red)}
-.char-count{font-size:.73rem;color:var(--muted);text-align:right}
-.btn-gen{background:var(--teal);color:#fff;border:none;border-radius:9px;padding:11px;font-size:.92rem;font-weight:600;cursor:pointer;width:100%;font-family:inherit;margin-top:2px}
-.btn-gen:hover{background:var(--teal-dk)}
-.btn-gen:disabled{background:#94A3B8;cursor:not-allowed}
-.err-banner{display:none;background:var(--red-lt);border:1px solid #FCA5A5;border-radius:8px;padding:.7rem 1rem;font-size:.84rem;color:var(--red);margin-top:4px}
+.input-err{border-color:var(--red)!important}
+.char-wrap{display:flex;justify-content:flex-end}
+.char-count{font-size:.71rem;color:var(--muted)}
+
+/* tone preview */
+.tone-preview{
+  background:var(--cream);
+  border-left:3px solid var(--teal);
+  padding:8px 12px;
+  font-size:.8rem;color:var(--muted);
+  line-height:1.5;font-style:italic;
+  border-radius:0 6px 6px 0;
+  display:none;
+}
+.tone-preview.show{display:block}
+
+.btn-gen{
+  background:linear-gradient(135deg,var(--teal) 0%,var(--teal-dk) 100%);
+  color:#fff;border:none;border-radius:9px;
+  padding:13px;font-size:.93rem;font-weight:600;
+  cursor:pointer;width:100%;
+  font-family:inherit;
+  transition:opacity .15s,transform .1s;
+  box-shadow:0 3px 10px rgba(12,124,95,0.28);
+  letter-spacing:.01em;
+}
+.btn-gen:hover{opacity:.92;transform:translateY(-1px)}
+.btn-gen:active{transform:translateY(0)}
+.btn-gen:disabled{background:#B0A99A;box-shadow:none;cursor:not-allowed;transform:none}
+
+.err-banner{
+  display:none;
+  background:var(--red-lt);
+  border:1px solid #F5C0BC;
+  border-radius:8px;
+  padding:.7rem 1rem;
+  font-size:.83rem;color:var(--red);
+}
 .err-banner.show{display:block}
-.oc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);min-height:360px;display:flex;flex-direction:column}
-.oe{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:2rem;color:var(--muted)}
-.oi{font-size:2.2rem}
-.oe p{font-size:.88rem;text-align:center}
-.ol{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);font-size:.88rem}
-.pbar-wrap{width:200px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.pbar{height:100%;background:var(--teal);border-radius:2px;animation:prog 8s ease-in-out forwards}
-@keyframes prog{0%{width:0}80%{width:85%}100%{width:85%}}
+
+/* ── OUTPUT CARD ─────────────────────────── */
+.oc{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  min-height:400px;
+  display:flex;flex-direction:column;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.oe{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:12px;padding:2.5rem;color:var(--muted);
+}
+.oe-icon{
+  width:56px;height:56px;
+  background:var(--cream);border:1px solid var(--border);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;
+}
+.oe p{font-size:.88rem;text-align:center;line-height:1.5}
+.oe-hint{font-size:.76rem;color:var(--border);margin-top:4px}
+
+.ol{
+  flex:1;display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:14px;color:var(--muted);font-size:.88rem;
+}
+.pbar-track{width:180px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.pbar-fill{height:100%;background:var(--teal);border-radius:2px;animation:prog 10s ease-in-out forwards}
+@keyframes prog{0%{width:0}80%{width:88%}100%{width:88%}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spin{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .75s linear infinite}
+.spin{
+  width:28px;height:28px;
+  border:2.5px solid var(--border);
+  border-top-color:var(--teal);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+
 .or{flex:1;display:none;flex-direction:column}
-.rh{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--border);background:#F8FAFC;border-radius:var(--r) var(--r) 0 0;flex-wrap:wrap;gap:6px}
+.rh{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  background:var(--cream);
+  flex-wrap:wrap;gap:6px;
+}
 .rh-l{display:flex;align-items:center;gap:8px}
-.rh-r{display:flex;align-items:center;gap:6px}
-.rl{font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.bc{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:inherit}
-.bc.cp{background:var(--teal-lt);border-color:var(--teal);color:var(--teal)}
-.btn-regen{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:inherit}
-.fb{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 7px;font-size:.78rem;cursor:pointer}
+.rh-r{display:flex;align-items:center;gap:5px}
+.rl{
+  font-size:.72rem;font-weight:700;
+  color:var(--muted);text-transform:uppercase;
+  letter-spacing:.07em;
+}
+.meta-tag{
+  font-size:.7rem;color:var(--muted);
+  background:var(--sand);
+  border:1px solid var(--border);
+  border-radius:4px;padding:2px 7px;
+  white-space:nowrap;
+}
+.fb{
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:5px;padding:3px 7px;
+  font-size:.75rem;cursor:pointer;
+  transition:all .15s;
+}
 .fb.fb-up.on{background:var(--green-lt);border-color:#86EFAC}
 .fb.fb-dn.on{background:var(--red-lt);border-color:#FCA5A5}
-.rt{padding:1.1rem 1.25rem;font-size:.88rem;line-height:1.8;color:var(--text);white-space:pre-wrap;flex:1;overflow-y:auto}
-.rt[dir=rtl]{font-size:.96rem;text-align:right}
+
+.btn-regen,.btn-dl,.bc{
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:5px;padding:4px 10px;
+  font-size:.76rem;color:var(--muted);
+  cursor:pointer;font-family:inherit;
+  transition:all .15s;white-space:nowrap;
+}
+.btn-regen:hover,.btn-dl:hover,.bc:hover{
+  border-color:var(--teal);color:var(--teal);
+}
+.bc.cp{
+  background:var(--teal-lt);
+  border-color:var(--teal);color:var(--teal);
+}
+
+.rt{
+  padding:1.25rem 1.5rem;
+  font-size:.88rem;line-height:1.9;
+  color:var(--ink);white-space:pre-wrap;
+  flex:1;overflow-y:auto;
+}
+.rt[dir=rtl]{
+  font-size:.95rem;text-align:right;
+  font-family:'DM Sans','Segoe UI','Arial',sans-serif;
+}
+
+/* ── HISTORY ─────────────────────────────── */
+.history-section{
+  margin-top:1.75rem;
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:var(--shadow-sm);
+  display:none;
+  overflow:hidden;
+}
+.history-section.show{display:block}
+.hist-hd{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:11px 16px;
+  border-bottom:1px solid var(--border);
+  background:var(--cream);
+}
+.hist-hd span{
+  font-size:.84rem;font-weight:600;color:var(--forest);
+}
+.btn-clear-hist{
+  background:transparent;border:1px solid var(--border);
+  border-radius:5px;padding:2px 10px;
+  font-size:.73rem;color:var(--muted);
+  cursor:pointer;font-family:inherit;
+}
+.hist-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+}
+.hist-item{
+  padding:13px 16px;
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .15s;
+}
+.hist-item:hover{background:var(--cream)}
+.hist-item-type{
+  font-size:.7rem;font-weight:700;
+  color:var(--teal);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:4px;
+}
+.hist-item-preview{
+  font-size:.81rem;color:var(--muted);
+  line-height:1.4;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* ── FOOTER ──────────────────────────────── */
+footer{
+  background:var(--forest);
+  padding:1.5rem 0;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+footer p{
+  color:rgba(255,255,255,0.28);
+  font-size:.77rem;text-align:center;
+}
+
+/* ── RTL ──────────────────────────────────── */
 body.rtl{direction:rtl}
-body.rtl .hd,body.rtl .brand,body.rtl .tabs,body.rtl .rh,body.rtl .rh-l,body.rtl .rh-r{flex-direction:row-reverse}
-body.rtl label{text-align:right}
-footer{margin-top:auto;padding:1rem 0;border-top:1px solid var(--border)}
-footer p{color:var(--muted);font-size:.77rem;text-align:center}
+body.rtl .hd,body.rtl .brand,body.rtl .tabs,
+body.rtl .rh,body.rtl .rh-l,body.rtl .rh-r,
+body.rtl .fc-top,body.rtl .pb-inner,body.rtl .hist-hd{
+  flex-direction:row-reverse;
+}
+body.rtl label,body.rtl .fd,body.rtl .fc h2{text-align:right}
+body.rtl .char-wrap{justify-content:flex-start}
+body.rtl .tone-preview{border-left:none;border-right:3px solid var(--teal);border-radius:6px 0 0 6px}
 </style>
 </head>
 <body>
 
-<div class="modal-overlay" id="key-modal">
-  <div class="modal">
-    <h3>OpenAI API Key</h3>
-    <p>Your key is stored in this browser session only. It is never saved to disk or sent anywhere except directly to OpenAI.</p>
-    <input type="password" id="key-input" placeholder="sk-..." autocomplete="off"/>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" onclick="saveKey()">Save Key</button>
-    </div>
+<!-- PROFILE BAR -->
+<div class="profile-bar" id="profile-bar">
+  <div class="wrap pb-inner">
+    <span id="pb-text">Using saved profile: <strong id="pb-name"></strong></span>
+    <button class="btn-clear-profile" onclick="clearProfile()" id="btn-clear-p">Clear</button>
   </div>
 </div>
 
 <header>
   <div class="wrap hd">
-    <div class="brand">
-      <div class="bi">G</div>
-      <div><span class="bn">GulfGrant AI</span><span class="bt" id="tag">AI Writing Assistant for Gulf NGOs</span></div>
-    </div>
+    <a class="brand" href="#">
+      <div class="logo">
+        <!-- G letterform built from teal arcs — clean, readable, purposeful -->
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <path d="M20 7.2C18.1 5.4 15.7 4.3 13 4.3C7.6 4.3 3.3 8.6 3.3 14C3.3 19.4 7.6 23.7 13 23.7C16.2 23.7 19.1 22.1 20.8 19.6V14H13.5V16.5H18.1C17.1 18.4 15.2 19.6 13 19.6C9.8 19.6 7.2 17 7.2 14C7.2 11 9.8 8.4 13 8.4C14.5 8.4 15.9 9 16.9 9.9L20 7.2Z" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <span class="brand-name">GulfGrant AI</span>
+        <span class="brand-sub" id="brand-sub">Writing Assistant for NGOs</span>
+      </div>
+    </a>
     <div class="hdr-right">
-      <button class="key-btn unset" id="key-btn" onclick="openModal()">&#9888; API Key Not Set</button>
       <div class="lsw">
-        <button class="lb on" id="len" onclick="sL('en')">EN</button>
-        <button class="lb" id="lar" onclick="sL('ar')">&#1593;&#1585;</button>
+        <button class="lb on" id="len" onclick="setLang('en')">EN</button>
+        <button class="lb"    id="lar" onclick="setLang('ar')">AR</button>
       </div>
     </div>
   </div>
 </header>
 
-<main class="wrap">
-  <section class="hero">
-    <p id="hero">Professional grant proposals, donor emails, and social media posts &mdash; in Arabic and English &mdash; in minutes.</p>
-  </section>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <circle cx="6" cy="6" r="5" stroke="#6ECFB5" stroke-width="1.5"/>
+        <circle cx="6" cy="6" r="2" fill="#6ECFB5"/>
+      </svg>
+      Built for Gulf NGOs
+    </div>
+    <h1 id="hero-h1">Grant proposals.<br><em>Done in minutes.</em></h1>
+    <p id="hero-p">Professional writing for civil society organisations across Oman and the UAE — in Arabic and English, at no cost.</p>
+    <div class="hero-pills">
+      <span class="hero-pill" id="hp1">Grant Writing</span>
+      <span class="hero-pill" id="hp2">Donor Outreach</span>
+      <span class="hero-pill" id="hp3">Social Media</span>
+      <span class="hero-pill" id="hp4">Arabic + English</span>
+    </div>
+  </div>
+</section>
+
+<div class="main-body">
+<div class="wrap">
 
   <div class="tabs">
-    <button class="tab on" id="tg" onclick="sT('g')">&#128196; <span id="tlg">Grant Writing</span></button>
-    <button class="tab" id="td" onclick="sT('d')">&#128140; <span id="tld">Donor Email</span></button>
-    <button class="tab" id="ts" onclick="sT('s')">&#128241; <span id="tls">Social Media</span></button>
+    <button class="tab on" id="tg" onclick="switchTab('g')"><span id="tlg">Grant Writing</span></button>
+    <button class="tab"    id="td" onclick="switchTab('d')"><span id="tld">Donor Email</span></button>
+    <button class="tab"    id="ts" onclick="switchTab('s')"><span id="tls">Social Media</span></button>
   </div>
 
+  <!-- ── GRANT ── -->
   <div class="panel on" id="pg">
     <div class="grid">
       <div class="fc">
-        <h2 id="gh">Grant Application Writer</h2>
-        <p class="fd" id="gd">Fill in your organisation details to receive a complete, structured grant proposal.</p>
-        <div class="field"><label>Organisation name</label><input type="text" id="gn" placeholder="e.g. Oman Youth Welfare Society"/><span class="field-err" id="gn-e">This field is required.</span></div>
-        <div class="field"><label>Cause or mission</label><textarea id="gc" rows="3" placeholder="e.g. Vocational training for underprivileged youth in Muscat" oninput="cc(this,'gc-c')"></textarea><span class="char-count" id="gc-c">0 / 300</span><span class="field-err" id="gc-e">This field is required.</span></div>
-        <div class="field-row">
-          <div class="field"><label>Funding requested</label><input type="text" id="ga" placeholder="e.g. OMR 15,000"/><span class="field-err" id="ga-e">Required.</span></div>
-          <div class="field"><label>Type of funder</label><input type="text" id="gf" placeholder="e.g. Corporate CSR"/><span class="field-err" id="gf-e">Required.</span></div>
+        <div class="fc-top">
+          <div>
+            <h2 id="gh">Grant Application Writer</h2>
+            <p class="fd" id="gd">Complete, structured proposals ready to submit.</p>
+          </div>
+          <button class="btn-save-profile" onclick="saveProfile('g')" id="sp-g">Save Profile</button>
+        </div>
+        <div class="field">
+          <label id="lg1">Organisation name</label>
+          <input type="text" id="gn" placeholder="e.g. Oman Youth Welfare Society"/>
+          <span class="field-err" id="gn-e">Required.</span>
+        </div>
+        <div class="field">
+          <label id="lg2">Cause or mission</label>
+          <textarea id="gc" rows="3" placeholder="e.g. Vocational training for underprivileged youth in Muscat" oninput="cc(this,'gc-c')"></textarea>
+          <div class="char-wrap"><span class="char-count" id="gc-c">0 / 300</span></div>
+          <span class="field-err" id="gc-e">Required.</span>
         </div>
         <div class="field-row">
-          <div class="field"><label>Tone</label><select id="gt"><option value="formal">Formal</option><option value="warm">Warm</option><option value="urgent">Urgent</option></select></div>
-          <div class="field"><label>Length</label><select id="gl"><option value="short">Short (~350w)</option><option value="medium" selected>Medium (~550w)</option><option value="long">Long (~750w)</option></select></div>
+          <div class="field">
+            <label id="lg3">Funding requested</label>
+            <input type="text" id="ga" placeholder="e.g. OMR 15,000"/>
+            <span class="field-err" id="ga-e">Required.</span>
+          </div>
+          <div class="field">
+            <label id="lg4">Type of funder</label>
+            <input type="text" id="gf" placeholder="e.g. Corporate CSR"/>
+            <span class="field-err" id="gf-e">Required.</span>
+          </div>
         </div>
+        <div class="field-row">
+          <div class="field">
+            <label id="lg5">Tone</label>
+            <select id="gt" onchange="tonePrev('gt','gtp')">
+              <option value="formal">Formal</option>
+              <option value="warm">Warm</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <div class="field">
+            <label id="lg6">Length</label>
+            <select id="gl">
+              <option value="short">Short (~350 words)</option>
+              <option value="medium" selected>Medium (~550 words)</option>
+              <option value="long">Long (~750 words)</option>
+            </select>
+          </div>
+        </div>
+        <div class="tone-preview" id="gtp"></div>
         <button class="btn-gen" id="bgb" onclick="go('g')"><span id="bgl">Generate Grant Proposal</span></button>
         <div class="err-banner" id="gerr"></div>
       </div>
       <div class="oc">
-        <div class="oe" id="oeg"><div class="oi">&#128196;</div><p>Your grant proposal will appear here.</p></div>
-        <div class="ol" id="olg"><div class="spin"></div><p>Writing your grant proposal...</p><div class="pbar-wrap"><div class="pbar"></div></div></div>
-        <div class="or" id="org"><div class="rh"><div class="rh-l"><span class="rl">Grant Proposal</span><button class="fb fb-up" onclick="fb(this,'g','up')">&#128077;</button><button class="fb fb-dn" onclick="fb(this,'g','dn')">&#128078;</button></div><div class="rh-r"><button class="btn-regen" onclick="go('g')">&#8635; Regenerate</button><button class="bc" id="bcg" onclick="cp('rtg','bcg')">Copy</button></div></div><div class="rt" id="rtg"></div></div>
+        <div class="oe" id="oeg">
+          <div class="oe-icon">📄</div>
+          <p id="epg">Your grant proposal will appear here.</p>
+          <span class="oe-hint" id="hntg">Fill in the form and click Generate</span>
+        </div>
+        <div class="ol" id="olg">
+          <div class="spin"></div>
+          <p id="lpg">Writing your grant proposal...</p>
+          <div class="pbar-track"><div class="pbar-fill"></div></div>
+        </div>
+        <div class="or" id="org">
+          <div class="rh">
+            <div class="rh-l">
+              <span class="rl" id="rlg">Grant Proposal</span>
+              <span class="meta-tag" id="meta-g"></span>
+              <button class="fb fb-up" onclick="fbk(this,'g','up')">👍</button>
+              <button class="fb fb-dn" onclick="fbk(this,'g','dn')">👎</button>
+            </div>
+            <div class="rh-r">
+              <button class="btn-dl" onclick="dlDoc('rtg','grant')" id="dlg">Download</button>
+              <button class="btn-regen" onclick="go('g')" id="rgg">Regenerate</button>
+              <button class="bc" id="bcg" onclick="cpOut('rtg','bcg')">Copy</button>
+            </div>
+          </div>
+          <div class="rt" id="rtg"></div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- ── DONOR ── -->
   <div class="panel" id="pd">
     <div class="grid">
       <div class="fc">
-        <h2 id="dh">Donor Outreach Email</h2>
-        <p class="fd" id="dd">Generate a warm, personalised email to reach potential donors.</p>
-        <div class="field"><label>Organisation name</label><input type="text" id="dn" placeholder="e.g. Gulf Environmental Alliance"/><span class="field-err" id="dn-e">This field is required.</span></div>
-        <div class="field"><label>Campaign or appeal</label><textarea id="dc" rows="3" placeholder="e.g. Ramadan water wells campaign for rural Oman" oninput="cc(this,'dc-c')"></textarea><span class="char-count" id="dc-c">0 / 300</span><span class="field-err" id="dc-e">This field is required.</span></div>
-        <div class="field-row">
-          <div class="field"><label>Donor type</label><select id="dt"><option value="individual">Individual</option><option value="corporate">Corporate</option><option value="foundation">Foundation</option><option value="government">Government</option></select></div>
-          <div class="field"><label>Tone</label><select id="dtn"><option value="warm">Warm</option><option value="formal">Formal</option><option value="urgent">Urgent</option></select></div>
+        <div class="fc-top">
+          <div>
+            <h2 id="dh">Donor Outreach Email</h2>
+            <p class="fd" id="dd">Warm, personalised emails that move people to give.</p>
+          </div>
+          <button class="btn-save-profile" onclick="saveProfile('d')" id="sp-d">Save Profile</button>
         </div>
+        <div class="field">
+          <label id="ld1">Organisation name</label>
+          <input type="text" id="dn" placeholder="e.g. Gulf Environmental Alliance"/>
+          <span class="field-err" id="dn-e">Required.</span>
+        </div>
+        <div class="field">
+          <label id="ld2">Campaign or appeal</label>
+          <textarea id="dc" rows="3" placeholder="e.g. Ramadan water wells campaign for rural Oman" oninput="cc(this,'dc-c')"></textarea>
+          <div class="char-wrap"><span class="char-count" id="dc-c">0 / 300</span></div>
+          <span class="field-err" id="dc-e">Required.</span>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label id="ld3">Donor type</label>
+            <select id="dt">
+              <option value="individual">Individual</option>
+              <option value="corporate">Corporate</option>
+              <option value="foundation">Foundation</option>
+              <option value="government">Government</option>
+            </select>
+          </div>
+          <div class="field">
+            <label id="ld4">Tone</label>
+            <select id="dtn" onchange="tonePrev('dtn','dtp')">
+              <option value="warm">Warm</option>
+              <option value="formal">Formal</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+        <div class="tone-preview" id="dtp"></div>
         <button class="btn-gen" id="bdb" onclick="go('d')"><span id="bdl">Generate Donor Email</span></button>
         <div class="err-banner" id="derr"></div>
       </div>
       <div class="oc">
-        <div class="oe" id="oed"><div class="oi">&#128140;</div><p>Your donor email will appear here.</p></div>
-        <div class="ol" id="old"><div class="spin"></div><p>Writing your donor email...</p><div class="pbar-wrap"><div class="pbar"></div></div></div>
-        <div class="or" id="ord"><div class="rh"><div class="rh-l"><span class="rl">Donor Email</span><button class="fb fb-up" onclick="fb(this,'d','up')">&#128077;</button><button class="fb fb-dn" onclick="fb(this,'d','dn')">&#128078;</button></div><div class="rh-r"><button class="btn-regen" onclick="go('d')">&#8635; Regenerate</button><button class="bc" id="bcd" onclick="cp('rtd','bcd')">Copy</button></div></div><div class="rt" id="rtd"></div></div>
+        <div class="oe" id="oed">
+          <div class="oe-icon">💌</div>
+          <p id="epd">Your donor email will appear here.</p>
+          <span class="oe-hint" id="hntd">Fill in the form and click Generate</span>
+        </div>
+        <div class="ol" id="old">
+          <div class="spin"></div>
+          <p id="lpd">Writing your donor email...</p>
+          <div class="pbar-track"><div class="pbar-fill"></div></div>
+        </div>
+        <div class="or" id="ord">
+          <div class="rh">
+            <div class="rh-l">
+              <span class="rl" id="rld">Donor Email</span>
+              <span class="meta-tag" id="meta-d"></span>
+              <button class="fb fb-up" onclick="fbk(this,'d','up')">👍</button>
+              <button class="fb fb-dn" onclick="fbk(this,'d','dn')">👎</button>
+            </div>
+            <div class="rh-r">
+              <button class="btn-dl" onclick="dlDoc('rtd','donor-email')" id="dld">Download</button>
+              <button class="btn-regen" onclick="go('d')" id="rgd">Regenerate</button>
+              <button class="bc" id="bcd" onclick="cpOut('rtd','bcd')">Copy</button>
+            </div>
+          </div>
+          <div class="rt" id="rtd"></div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- ── SOCIAL ── -->
   <div class="panel" id="ps">
     <div class="grid">
       <div class="fc">
-        <h2 id="sh">Social Media Post</h2>
-        <p class="fd" id="sd">Create platform-ready posts with hashtags to grow your reach.</p>
-        <div class="field"><label>Organisation name</label><input type="text" id="sn" placeholder="e.g. Muscat Community Foundation"/><span class="field-err" id="sn-e">This field is required.</span></div>
-        <div class="field"><label>What do you want to share?</label><textarea id="su" rows="3" placeholder="e.g. We completed 3 water wells serving 400 families in rural Oman" oninput="cc(this,'su-c')"></textarea><span class="char-count" id="su-c">0 / 300</span><span class="field-err" id="su-e">This field is required.</span></div>
-        <div class="field-row">
-          <div class="field"><label>Platform</label><select id="sp"><option value="instagram">Instagram</option><option value="linkedin">LinkedIn</option><option value="x">X (Twitter)</option><option value="facebook">Facebook</option></select></div>
-          <div class="field"><label>Tone</label><select id="stn"><option value="inspiring">Inspiring</option><option value="informative">Informative</option><option value="urgent">Urgent</option><option value="celebratory">Celebratory</option></select></div>
+        <div class="fc-top">
+          <div>
+            <h2 id="sh">Social Media Post</h2>
+            <p class="fd" id="sd">Platform-ready posts with hashtags that get shared.</p>
+          </div>
+          <button class="btn-save-profile" onclick="saveProfile('s')" id="sp-s">Save Profile</button>
         </div>
+        <div class="field">
+          <label id="ls1">Organisation name</label>
+          <input type="text" id="sn" placeholder="e.g. Muscat Community Foundation"/>
+          <span class="field-err" id="sn-e">Required.</span>
+        </div>
+        <div class="field">
+          <label id="ls2">What do you want to share?</label>
+          <textarea id="su" rows="3" placeholder="e.g. We completed 3 water wells serving 400 families in rural Oman" oninput="cc(this,'su-c')"></textarea>
+          <div class="char-wrap"><span class="char-count" id="su-c">0 / 300</span></div>
+          <span class="field-err" id="su-e">Required.</span>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label id="ls3">Platform</label>
+            <select id="sp">
+              <option value="instagram">Instagram</option>
+              <option value="linkedin">LinkedIn</option>
+              <option value="x">X (Twitter)</option>
+              <option value="facebook">Facebook</option>
+            </select>
+          </div>
+          <div class="field">
+            <label id="ls4">Tone</label>
+            <select id="stn" onchange="tonePrev('stn','stp')">
+              <option value="inspiring">Inspiring</option>
+              <option value="informative">Informative</option>
+              <option value="urgent">Urgent</option>
+              <option value="celebratory">Celebratory</option>
+            </select>
+          </div>
+        </div>
+        <div class="tone-preview" id="stp"></div>
         <button class="btn-gen" id="bsb" onclick="go('s')"><span id="bsl">Generate Social Post</span></button>
         <div class="err-banner" id="serr"></div>
       </div>
       <div class="oc">
-        <div class="oe" id="oes"><div class="oi">&#128241;</div><p>Your social media post will appear here.</p></div>
-        <div class="ol" id="ols"><div class="spin"></div><p>Writing your social post...</p><div class="pbar-wrap"><div class="pbar"></div></div></div>
-        <div class="or" id="ors"><div class="rh"><div class="rh-l"><span class="rl">Social Post</span><button class="fb fb-up" onclick="fb(this,'s','up')">&#128077;</button><button class="fb fb-dn" onclick="fb(this,'s','dn')">&#128078;</button></div><div class="rh-r"><button class="btn-regen" onclick="go('s')">&#8635; Regenerate</button><button class="bc" id="bcs" onclick="cp('rts','bcs')">Copy</button></div></div><div class="rt" id="rts"></div></div>
+        <div class="oe" id="oes">
+          <div class="oe-icon">📱</div>
+          <p id="eps">Your social media post will appear here.</p>
+          <span class="oe-hint" id="hnts">Fill in the form and click Generate</span>
+        </div>
+        <div class="ol" id="ols">
+          <div class="spin"></div>
+          <p id="lps">Writing your social post...</p>
+          <div class="pbar-track"><div class="pbar-fill"></div></div>
+        </div>
+        <div class="or" id="ors">
+          <div class="rh">
+            <div class="rh-l">
+              <span class="rl" id="rls">Social Post</span>
+              <span class="meta-tag" id="meta-s"></span>
+              <button class="fb fb-up" onclick="fbk(this,'s','up')">👍</button>
+              <button class="fb fb-dn" onclick="fbk(this,'s','dn')">👎</button>
+            </div>
+            <div class="rh-r">
+              <button class="btn-dl" onclick="dlDoc('rts','social-post')" id="dls">Download</button>
+              <button class="btn-regen" onclick="go('s')" id="rgs">Regenerate</button>
+              <button class="bc" id="bcs" onclick="cpOut('rts','bcs')">Copy</button>
+            </div>
+          </div>
+          <div class="rt" id="rts"></div>
+        </div>
       </div>
     </div>
   </div>
-</main>
 
-<footer><div class="wrap"><p>GulfGrant AI &mdash; Built for Gulf NGOs &mdash; 2026</p></div></footer>
+  <!-- HISTORY -->
+  <div class="history-section" id="hist-wrap">
+    <div class="hist-hd">
+      <span id="hist-lbl">Recent Generations</span>
+      <button class="btn-clear-hist" onclick="clearHist()" id="btn-ch">Clear all</button>
+    </div>
+    <div class="hist-grid" id="hist-grid"></div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p id="ft">GulfGrant AI &mdash; Supporting civil society across the Gulf &mdash; 2026</p>
+  </div>
+</footer>
 
 <script>
-var lang='en', apiKey='', fbLog=[];
-function el(id){return document.getElementById(id);}
-function openModal(){el('key-modal').classList.add('open');el('key-input').focus();}
-function closeModal(){el('key-modal').classList.remove('open');}
-function saveKey(){var k=el('key-input').value.trim();if(!k)return;apiKey=k;var b=el('key-btn');b.textContent='\u2713 API Key Set';b.className='key-btn set';closeModal();}
-el('key-modal').addEventListener('click',function(e){if(e.target===el('key-modal'))closeModal();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
-function sL(l){lang=l;document.documentElement.lang=l;document.body.classList.toggle('rtl',l==='ar');el('len').classList.toggle('on',l==='en');el('lar').classList.toggle('on',l==='ar');}
-function sT(n){['g','d','s'].forEach(function(x){el('t'+x).classList.toggle('on',x===n);el('p'+x).classList.toggle('on',x===n);});}
-function showState(t,s){var e=el('oe'+t),l=el('ol'+t),r=el('or'+t);e.style.display='none';l.style.display='none';r.style.display='none';if(s==='e')e.style.display='flex';if(s==='l')l.style.display='flex';if(s==='r')r.style.display='flex';}
-function cc(input,cid){var len=input.value.length;var c=el(cid);c.textContent=len+' / 300';c.style.color=len>300?'#DC2626':'#64748B';}
-function validate(t){var ok=true;var fields={g:['gn','gc','ga','gf'],d:['dn','dc'],s:['sn','su']};fields[t].forEach(function(id){var inp=el(id),err=el(id+'-e');if(!inp.value.trim()){inp.classList.add('input-err');err.classList.add('show-err');ok=false;}else{inp.classList.remove('input-err');err.classList.remove('show-err');}});return ok;}
+var lang='en', fbLog=[], hist=[], MAX_H=4;
+
+var T={
+  en:{
+    brandSub:'Writing Assistant for NGOs',
+    heroH1:'Grant proposals.<br><em>Done in minutes.</em>',
+    heroP:'Professional writing for civil society organisations across Oman and the UAE — in Arabic and English, at no cost.',
+    hp1:'Grant Writing',hp2:'Donor Outreach',hp3:'Social Media',hp4:'Arabic + English',
+    tlg:'Grant Writing',tld:'Donor Email',tls:'Social Media',
+    gh:'Grant Application Writer',gd:'Complete, structured proposals ready to submit.',
+    dh:'Donor Outreach Email',dd:'Warm, personalised emails that move people to give.',
+    sh:'Social Media Post',sd:'Platform-ready posts with hashtags that get shared.',
+    lg1:'Organisation name',lg2:'Cause or mission',lg3:'Funding requested',lg4:'Type of funder',lg5:'Tone',lg6:'Length',
+    ld1:'Organisation name',ld2:'Campaign or appeal',ld3:'Donor type',ld4:'Tone',
+    ls1:'Organisation name',ls2:'What do you want to share?',ls3:'Platform',ls4:'Tone',
+    bgl:'Generate Grant Proposal',bdl:'Generate Donor Email',bsl:'Generate Social Post',
+    epg:'Your grant proposal will appear here.',epd:'Your donor email will appear here.',eps:'Your social media post will appear here.',
+    hntg:'Fill in the form and click Generate',hntd:'Fill in the form and click Generate',hnts:'Fill in the form and click Generate',
+    lpg:'Writing your grant proposal...',lpd:'Writing your donor email...',lps:'Writing your social post...',
+    rlg:'Grant Proposal',rld:'Donor Email',rls:'Social Post',
+    copy:'Copy',copied:'Copied!',dl:'Download',regen:'Regenerate',
+    spBtn:'Save Profile',clrP:'Clear',histLbl:'Recent Generations',clrH:'Clear all',
+    usingP:'Using saved profile:',pSaved:'Profile saved.',
+    errF:'Please fill in all required fields.',errS:'Something went wrong. Please try again.',
+    ft:'GulfGrant AI \u2014 Supporting civil society across the Gulf \u2014 2026',
+    tones:{
+      formal:'Formal and professional \u2014 structured, objective language suited to government and corporate funders.',
+      warm:'Warm and community-focused \u2014 personal, caring language that builds genuine human connection.',
+      urgent:'Urgent and impact-driven \u2014 compelling, time-sensitive framing that moves people to act now.',
+      inspiring:'Inspiring and uplifting \u2014 positive, aspirational, focused on possibility and shared purpose.',
+      informative:'Informative and factual \u2014 clear, evidence-based, data-forward communication.',
+      celebratory:'Celebratory and grateful \u2014 joyful, appreciative, honouring achievement and support.',
+    }
+  },
+  ar:{
+    brandSub:'\u0645\u0633\u0627\u0639\u062f \u0643\u062a\u0627\u0628\u0629 \u0644\u0645\u0646\u0638\u0645\u0627\u062a \u0627\u0644\u062e\u0644\u064a\u062c',
+    heroH1:'\u0645\u0642\u062a\u0631\u062d\u0627\u062a \u0627\u0644\u0645\u0646\u062d.<br><em>\u0641\u064a \u062f\u0642\u0627\u0626\u0642.</em>',
+    heroP:'\u0643\u062a\u0627\u0628\u0629 \u0627\u062d\u062a\u0631\u0627\u0641\u064a\u0629 \u0644\u0645\u0646\u0638\u0645\u0627\u062a \u0627\u0644\u0645\u062c\u062a\u0645\u0639 \u0627\u0644\u0645\u062f\u0646\u064a \u0641\u064a \u0639\u0645\u0627\u0646 \u0648\u0627\u0644\u0625\u0645\u0627\u0631\u0627\u062a \u2014 \u0628\u0627\u0644\u0639\u0631\u0628\u064a\u0629 \u0648\u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0629\u060c \u0645\u062c\u0627\u0646\u0627\u064b.',
+    hp1:'\u0643\u062a\u0627\u0628\u0629 \u0627\u0644\u0645\u0646\u062d',hp2:'\u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0645\u0639 \u0627\u0644\u0645\u0627\u0646\u062d\u064a\u0646',hp3:'\u0648\u0633\u0627\u0626\u0644 \u0627\u0644\u062a\u0648\u0627\u0635\u0644',hp4:'\u0639\u0631\u0628\u064a + \u0625\u0646\u062c\u0644\u064a\u0632\u064a',
+    tlg:'\u0643\u062a\u0627\u0628\u0629 \u0627\u0644\u0645\u0646\u062d',tld:'\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0645\u0627\u0646\u062d\u064a\u0646',tls:'\u0648\u0633\u0627\u0626\u0644 \u0627\u0644\u062a\u0648\u0627\u0635\u0644',
+    gh:'\u0643\u0627\u062a\u0628 \u0637\u0644\u0628\u0627\u062a \u0627\u0644\u0645\u0646\u062d',gd:'\u0645\u0642\u062a\u0631\u062d\u0627\u062a \u0643\u0627\u0645\u0644\u0629 \u0648\u0645\u0646\u0638\u0645\u0629 \u062c\u0627\u0647\u0632\u0629 \u0644\u0644\u062a\u0642\u062f\u064a\u0645.',
+    dh:'\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0645\u0639 \u0627\u0644\u0645\u0627\u0646\u062d\u064a\u0646',dd:'\u0631\u0633\u0627\u0626\u0644 \u062f\u0627\u0641\u0626\u0629 \u0648\u0634\u062e\u0635\u064a\u0629 \u062a\u062d\u062b \u0627\u0644\u0646\u0627\u0633 \u0639\u0644\u0649 \u0627\u0644\u0639\u0637\u0627\u0621.',
+    sh:'\u0645\u0646\u0634\u0648\u0631 \u0648\u0633\u0627\u0626\u0644 \u0627\u0644\u062a\u0648\u0627\u0635\u0644',sd:'\u0645\u0646\u0634\u0648\u0631\u0627\u062a \u062c\u0627\u0647\u0632\u0629 \u0644\u0644\u0646\u0634\u0631 \u0645\u0639 \u0648\u0633\u0648\u0645 \u062a\u062d\u0635\u0644 \u0639\u0644\u0649 \u0645\u0634\u0627\u0631\u0643\u0627\u062a \u062d\u0642\u064a\u0642\u064a\u0629.',
+    lg1:'\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u0638\u0645\u0629',lg2:'\u0627\u0644\u0642\u0636\u064a\u0629 \u0623\u0648 \u0627\u0644\u0631\u0633\u0627\u0644\u0629',lg3:'\u0627\u0644\u062a\u0645\u0648\u064a\u0644 \u0627\u0644\u0645\u0637\u0644\u0648\u0628',lg4:'\u0646\u0648\u0639 \u0627\u0644\u062c\u0647\u0629 \u0627\u0644\u0645\u0627\u0646\u062d\u0629',lg5:'\u0627\u0644\u0646\u0628\u0631\u0629',lg6:'\u0627\u0644\u0637\u0648\u0644',
+    ld1:'\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u0638\u0645\u0629',ld2:'\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u062d\u0645\u0644\u0629',ld3:'\u0646\u0648\u0639 \u0627\u0644\u0645\u0627\u0646\u062d',ld4:'\u0627\u0644\u0646\u0628\u0631\u0629',
+    ls1:'\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u0638\u0645\u0629',ls2:'\u0645\u0627\u0630\u0627 \u062a\u0631\u064a\u062f \u0645\u0634\u0627\u0631\u0643\u062a\u0647\u061f',ls3:'\u0627\u0644\u0645\u0646\u0635\u0629',ls4:'\u0627\u0644\u0646\u0628\u0631\u0629',
+    bgl:'\u0625\u0646\u0634\u0627\u0621 \u0645\u0642\u062a\u0631\u062d \u0627\u0644\u0645\u0646\u062d\u0629',bdl:'\u0625\u0646\u0634\u0627\u0621 \u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0645\u0627\u0646\u062d\u064a\u0646',bsl:'\u0625\u0646\u0634\u0627\u0621 \u0645\u0646\u0634\u0648\u0631',
+    epg:'\u0633\u064a\u0638\u0647\u0631 \u0645\u0642\u062a\u0631\u062d \u0627\u0644\u0645\u0646\u062d\u0629 \u0647\u0646\u0627.',epd:'\u0633\u062a\u0638\u0647\u0631 \u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0645\u0627\u0646\u062d\u064a\u0646 \u0647\u0646\u0627.',eps:'\u0633\u064a\u0638\u0647\u0631 \u0627\u0644\u0645\u0646\u0634\u0648\u0631 \u0647\u0646\u0627.',
+    hntg:'\u0627\u0645\u0644\u0623 \u0627\u0644\u0646\u0645\u0648\u0630\u062c \u0648\u0627\u0636\u063a\u0637 \u0625\u0646\u0634\u0627\u0621',hntd:'\u0627\u0645\u0644\u0623 \u0627\u0644\u0646\u0645\u0648\u0630\u062c \u0648\u0627\u0636\u063a\u0637 \u0625\u0646\u0634\u0627\u0621',hnts:'\u0627\u0645\u0644\u0623 \u0627\u0644\u0646\u0645\u0648\u0630\u062c \u0648\u0627\u0636\u063a\u0637 \u0625\u0646\u0634\u0627\u0621',
+    lpg:'\u062c\u0627\u0631\u064d \u0643\u062a\u0627\u0628\u0629 \u0645\u0642\u062a\u0631\u062d \u0627\u0644\u0645\u0646\u062d\u0629...',lpd:'\u062c\u0627\u0631\u064d \u0643\u062a\u0627\u0628\u0629 \u0627\u0644\u0631\u0633\u0627\u0644\u0629...',lps:'\u062c\u0627\u0631\u064d \u0643\u062a\u0627\u0628\u0629 \u0627\u0644\u0645\u0646\u0634\u0648\u0631...',
+    rlg:'\u0645\u0642\u062a\u0631\u062d \u0627\u0644\u0645\u0646\u062d\u0629',rld:'\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0645\u0627\u0646\u062d\u064a\u0646',rls:'\u0627\u0644\u0645\u0646\u0634\u0648\u0631',
+    copy:'\u0646\u0633\u062e',copied:'\u062a\u0645 \u0627\u0644\u0646\u0633\u062e!',dl:'\u062a\u0646\u0632\u064a\u0644',regen:'\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0625\u0646\u0634\u0627\u0621',
+    spBtn:'\u062d\u0641\u0638 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a',clrP:'\u0645\u0633\u062d',histLbl:'\u0627\u0644\u0625\u0646\u0634\u0627\u0621\u0627\u062a \u0627\u0644\u0623\u062e\u064a\u0631\u0629',clrH:'\u0645\u0633\u062d \u0627\u0644\u0643\u0644',
+    usingP:'\u0645\u0644\u0641 \u0634\u062e\u0635\u064a \u0645\u062d\u0641\u0648\u0638:',pSaved:'\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a.',
+    errF:'\u064a\u0631\u062c\u0649 \u0645\u0644\u0621 \u062c\u0645\u064a\u0639 \u0627\u0644\u062d\u0642\u0648\u0644.',errS:'\u062d\u062f\u062b \u062e\u0637\u0623. \u062d\u0627\u0648\u0644 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649.',
+    ft:'GulfGrant AI \u2014 \u062f\u0639\u0645 \u0627\u0644\u0645\u062c\u062a\u0645\u0639 \u0627\u0644\u0645\u062f\u0646\u064a \u0639\u0628\u0631 \u0627\u0644\u062e\u0644\u064a\u062c \u2014 2026',
+    tones:{
+      formal:'\u0631\u0633\u0645\u064a \u0648\u0627\u062d\u062a\u0631\u0627\u0641\u064a \u2014 \u0644\u063a\u0629 \u0645\u0646\u0638\u0645\u0629 \u0648\u0645\u0648\u0636\u0648\u0639\u064a\u0629 \u0645\u0646\u0627\u0633\u0628\u0629 \u0644\u0644\u062c\u0647\u0627\u062a \u0627\u0644\u062d\u0643\u0648\u0645\u064a\u0629 \u0648\u0627\u0644\u0634\u0631\u0643\u0627\u062a.',
+      warm:'\u062f\u0627\u0641\u0626 \u0648\u0645\u062c\u062a\u0645\u0639\u064a \u2014 \u0644\u063a\u0629 \u0634\u062e\u0635\u064a\u0629 \u0648\u062d\u0627\u0646\u064a\u0629 \u062a\u0628\u0646\u064a \u062a\u0648\u0627\u0635\u0644\u0627\u064b \u0625\u0646\u0633\u0627\u0646\u064a\u0627\u064b \u062d\u0642\u064a\u0642\u064a\u0627\u064b.',
+      urgent:'\u0639\u0627\u062c\u0644 \u0648\u0645\u0624\u062b\u0631 \u2014 \u0635\u064a\u0627\u063a\u0629 \u0645\u0642\u0646\u0639\u0629 \u0648\u062d\u0633\u0627\u0633\u0629 \u0644\u0644\u0648\u0642\u062a \u062a\u062f\u0641\u0639 \u0627\u0644\u0646\u0627\u0633 \u0644\u0644\u062a\u0635\u0631\u0641.',
+      inspiring:'\u0645\u0644\u0647\u0645 \u0648\u0645\u062d\u0641\u0632 \u2014 \u0625\u064a\u062c\u0627\u0628\u064a\u060c \u0637\u0645\u0648\u062d\u060c \u064a\u0631\u0643\u0632 \u0639\u0644\u0649 \u0627\u0644\u062a\u0623\u062b\u064a\u0631 \u0648\u0627\u0644\u0647\u062f\u0641 \u0627\u0644\u0645\u0634\u062a\u0631\u0643.',
+      informative:'\u0645\u0639\u0644\u0648\u0645\u0627\u062a\u064a \u0648\u062a\u062d\u0644\u064a\u0644\u064a \u2014 \u0648\u0627\u0636\u062d\u060c \u0645\u0628\u0646\u064a \u0639\u0644\u0649 \u0627\u0644\u0623\u062f\u0644\u0629\u060c \u062a\u0648\u0627\u0635\u0644 \u0645\u0648\u062c\u0647 \u0628\u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a.',
+      celebratory:'\u0627\u062d\u062a\u0641\u0627\u0644\u064a \u0648\u0634\u0627\u0643\u0631 \u2014 \u0628\u0647\u064a\u062c\u060c \u0645\u0645\u062a\u0646\u060c \u064a\u0643\u0631\u0645 \u0627\u0644\u0625\u0646\u062c\u0627\u0632\u0627\u062a \u0648\u0627\u0644\u062f\u0639\u0645.',
+    }
+  }
+};
+
+function el(id){return document.getElementById(id)}
+function setHTML(id,h){var n=el(id);if(!n)return;if(h&&(h.includes('<br>')||h.includes('<em>')))n.innerHTML=h;else n.textContent=h||''}
+
+function setLang(l){
+  lang=l;
+  document.documentElement.lang=l;
+  document.body.classList.toggle('rtl',l==='ar');
+  el('len').classList.toggle('on',l==='en');
+  el('lar').classList.toggle('on',l==='ar');
+  var t=T[l];
+  setHTML('brand-sub',t.brandSub);
+  setHTML('hero-h1',t.heroH1); setHTML('hero-p',t.heroP);
+  setHTML('hp1',t.hp1);setHTML('hp2',t.hp2);setHTML('hp3',t.hp3);setHTML('hp4',t.hp4);
+  setHTML('tlg',t.tlg);setHTML('tld',t.tld);setHTML('tls',t.tls);
+  setHTML('gh',t.gh);setHTML('gd',t.gd);
+  setHTML('dh',t.dh);setHTML('dd',t.dd);
+  setHTML('sh',t.sh);setHTML('sd',t.sd);
+  setHTML('lg1',t.lg1);setHTML('lg2',t.lg2);setHTML('lg3',t.lg3);
+  setHTML('lg4',t.lg4);setHTML('lg5',t.lg5);setHTML('lg6',t.lg6);
+  setHTML('ld1',t.ld1);setHTML('ld2',t.ld2);setHTML('ld3',t.ld3);setHTML('ld4',t.ld4);
+  setHTML('ls1',t.ls1);setHTML('ls2',t.ls2);setHTML('ls3',t.ls3);setHTML('ls4',t.ls4);
+  setHTML('bgl',t.bgl);setHTML('bdl',t.bdl);setHTML('bsl',t.bsl);
+  setHTML('epg',t.epg);setHTML('epd',t.epd);setHTML('eps',t.eps);
+  setHTML('hntg',t.hntg);setHTML('hntd',t.hntd);setHTML('hnts',t.hnts);
+  setHTML('lpg',t.lpg);setHTML('lpd',t.lpd);setHTML('lps',t.lps);
+  setHTML('rlg',t.rlg);setHTML('rld',t.rld);setHTML('rls',t.rls);
+  setHTML('hist-lbl',t.histLbl);setHTML('btn-ch',t.clrH);
+  setHTML('btn-clear-p',t.clrP);
+  setHTML('sp-g',t.spBtn);setHTML('sp-d',t.spBtn);setHTML('sp-s',t.spBtn);
+  setHTML('ft',t.ft);
+  ['g','d','s'].forEach(function(x){
+    var d=el('dl'+x),r=el('rg'+x),b=el('bc'+x);
+    if(d&&!d.classList.contains('cp'))d.textContent=t.dl;
+    if(r)r.textContent=t.regen;
+    if(b&&!b.classList.contains('cp'))b.textContent=t.copy;
+  });
+  var pf=loadProfile();
+  if(pf){el('pb-text').innerHTML=t.usingP+' <strong>'+pf.name+'</strong>';}
+}
+
+function switchTab(n){
+  ['g','d','s'].forEach(function(x){
+    el('t'+x).classList.toggle('on',x===n);
+    el('p'+x).classList.toggle('on',x===n);
+  });
+}
+
+function showState(t,s){
+  el('oe'+t).style.display='none';
+  el('ol'+t).style.display='none';
+  el('or'+t).style.display='none';
+  if(s==='e')el('oe'+t).style.display='flex';
+  if(s==='l')el('ol'+t).style.display='flex';
+  if(s==='r')el('or'+t).style.display='flex';
+}
+
+function cc(inp,cid){
+  var len=inp.value.length;
+  var c=el(cid);c.textContent=len+' / 300';
+  c.style.color=len>300?'#B52A1D':'#6E6559';
+}
+
+function tonePrev(selId,prevId){
+  var v=el(selId).value;
+  var p=el(prevId);
+  var lbl=T[lang].tones[v];
+  if(lbl){p.textContent=lbl;p.classList.add('show');}
+  else p.classList.remove('show');
+}
+
+function sanitize(s){
+  return String(s).replace(/</g,'').replace(/>/g,'').replace(/&/g,'and').trim().slice(0,500);
+}
+
+function validate(t){
+  var ok=true;
+  var flds={g:['gn','gc','ga','gf'],d:['dn','dc'],s:['sn','su']};
+  flds[t].forEach(function(id){
+    var inp=el(id),err=el(id+'-e');
+    if(!inp||!inp.value.trim()){
+      if(inp)inp.classList.add('input-err');
+      if(err)err.classList.add('show-err');
+      ok=false;
+    } else {
+      if(inp)inp.classList.remove('input-err');
+      if(err)err.classList.remove('show-err');
+    }
+  });
+  return ok;
+}
+
 function buildPrompt(t){
-  var ln=lang==='ar'?'Write the ENTIRE response in Arabic (Modern Standard Arabic, formal Gulf professional register). Do not include any English words.':'Write in clear, professional English.';
-  var cx='This is for a Gulf-region NGO based in Oman or the UAE. Be culturally aware, respectful of Islamic values, and reflect the community-oriented nature of Gulf civil society.';
-  if(t==='g'){var ngo=el('gn').value.trim(),cause=el('gc').value.trim(),amt=el('ga').value.trim(),funder=el('gf').value.trim(),tone=el('gt').value,len=el('gl').value;var wds={short:'approximately 350 words',medium:'approximately 550 words',long:'approximately 750 words'};return{system:'You are a senior grant writer with 15 years of experience securing funding for Gulf-region NGOs. You write compelling, specific proposals that win approval. '+ln+' '+cx,user:'Write a complete grant proposal:\n\nOrganisation: '+ngo+'\nMission: '+cause+'\nFunding requested: '+amt+'\nFunder type: '+funder+'\nTone: '+tone+'\n\nUse these sections:\n1. Executive Summary\n2. Organisation Background\n3. Problem Statement\n4. Project Description and Objectives\n5. Expected Impact and Beneficiaries\n6. Budget Overview\n7. Closing Statement\n\nLength: '+wds[len]+'. Tailored to a '+funder+'. Avoid generic language.'};}
-  if(t==='d'){var ngo=el('dn').value.trim(),camp=el('dc').value.trim(),dtype=el('dt').value,tone=el('dtn').value;return{system:'You are an expert fundraising writer for Gulf-region NGOs. You write donor emails that feel personal and human. '+ln+' '+cx,user:'Write a donor outreach email:\n\nOrganisation: '+ngo+'\nCampaign: '+camp+'\nDonor type: '+dtype+'\nTone: '+tone+'\n\nFormat:\n- Subject: [subject line]\n- Opening: warm greeting\n- Story: human impact behind the campaign\n- Ask: clear and specific\n- Closing: grateful\n- Sign-off: from the organisation\n\nLength: 260-320 words. Sound like a real person, not a template.'};}
-  if(t==='s'){var ngo=el('sn').value.trim(),upd=el('su').value.trim(),plat=el('sp').value,tone=el('stn').value;var guides={instagram:'150-220 words, 5-8 hashtags at end, emojis welcome, emotional and visual',linkedin:'120-180 words, professional, 3-5 hashtags, focus on impact and credibility',x:'Main text must be under 280 characters total including hashtags. Punchy and direct.',facebook:'100-180 words, conversational, 3-4 hashtags, warm and accessible'};return{system:'You are a social media expert for Gulf-region NGOs. You write posts that drive engagement and inspire action. '+ln+' '+cx,user:'Write a '+plat+' post:\n\nOrganisation: '+ngo+'\nContent: '+upd+'\nTone: '+tone+'\n\nPlatform guide: '+guides[plat]+'\n\nInclude: strong opening hook, core message, call to action, hashtags including #GulfNGO and #Oman or #UAE.'};}}
-function go(t){el(t+'err').classList.remove('show');if(!validate(t))return;if(!apiKey){openModal();return;}var btns={g:'bgb',d:'bdb',s:'bsb'};var btn=el(btns[t]);btn.disabled=true;showState(t,'l');callAPI(buildPrompt(t),t,btn,0);}
-function callAPI(prompt,t,btn,attempt){
-  fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:'gpt-4o',max_tokens:1400,temperature:0.72,messages:[{role:'system',content:prompt.system},{role:'user',content:prompt.user}]})})
-  .then(function(r){if(r.status===429&&attempt<2){setTimeout(function(){callAPI(prompt,t,btn,attempt+1);},2000*(attempt+1));return null;}if(r.status===401){showState(t,'e');var eb=el(t+'err');eb.textContent='Invalid API key. Click the key button in the header and re-enter your key.';eb.classList.add('show');btn.disabled=false;return null;}if(!r.ok)throw new Error('Server error '+r.status);return r.json();})
-  .then(function(data){if(!data)return;var text=data.choices[0].message.content;var textEl=el('rt'+t);textEl.textContent=text;textEl.setAttribute('dir',lang==='ar'?'rtl':'ltr');showState(t,'r');el('or'+t).querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});})
-  .catch(function(err){showState(t,'e');var eb=el(t+'err');eb.textContent='Something went wrong: '+err.message+'. Please try again.';eb.classList.add('show');})
-  .finally(function(){btn.disabled=false;});}
-function fb(btn,t,dir){btn.closest('.rh-l').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');fbLog.push({type:t,dir:dir,ts:new Date().toISOString()});}
-function cp(textId,btnId){var text=el(textId).textContent;if(!text)return;var b=el(btnId);navigator.clipboard.writeText(text).then(function(){b.textContent='Copied!';b.classList.add('cp');setTimeout(function(){b.textContent='Copy';b.classList.remove('cp');},2000);});}
+  var ln=lang==='ar'
+    ?'Write the ENTIRE response in Arabic (Modern Standard Arabic, formal Gulf professional register). Do not include any English words whatsoever.'
+    :'Write in clear, professional English.';
+  var cx='This is for a Gulf-region NGO in Oman or the UAE. Be culturally aware, respectful of Islamic values, and reflect the community-oriented spirit of Gulf civil society.';
+
+  if(t==='g'){
+    var ngo=sanitize(el('gn').value),cause=sanitize(el('gc').value);
+    var amt=sanitize(el('ga').value),funder=sanitize(el('gf').value);
+    var tone=el('gt').value,len=el('gl').value;
+    var wds={short:'approximately 350 words',medium:'approximately 550 words',long:'approximately 750 words'};
+    return{
+      system:'You are a senior grant writer with 15 years of experience securing funding for Gulf-region NGOs. You write compelling, specific proposals that win approval. '+ln+' '+cx,
+      user:'Write a complete grant proposal:\n\nOrganisation: '+ngo+'\nMission: '+cause+'\nFunding requested: '+amt+'\nFunder type: '+funder+'\nTone: '+tone+'\n\nStructure with these sections:\n1. Executive Summary\n2. Organisation Background\n3. Problem Statement\n4. Project Description and Objectives\n5. Expected Impact and Beneficiaries\n6. Budget Overview\n7. Closing Statement\n\nLength: '+wds[len]+'. Tailored specifically to a '+funder+'. No generic language.'
+    };
+  }
+  if(t==='d'){
+    var ngo=sanitize(el('dn').value),camp=sanitize(el('dc').value);
+    var dtype=el('dt').value,tone=el('dtn').value;
+    return{
+      system:'You are an expert fundraising writer for Gulf-region NGOs. You write donor emails that feel personal, warm, and authentic — never like a template. '+ln+' '+cx,
+      user:'Write a donor outreach email:\n\nOrganisation: '+ngo+'\nCampaign: '+camp+'\nDonor type: '+dtype+'\nTone: '+tone+'\n\nFormat:\n- Subject: [compelling subject line]\n- Opening: warm, personal greeting\n- Story: vivid human impact behind this campaign\n- The ask: clear, specific, and respectful\n- Closing: grateful and warm\n- Sign-off: from the organisation\n\nLength: 260-320 words. Sound like a real human being.'
+    };
+  }
+  if(t==='s'){
+    var ngo=sanitize(el('sn').value),upd=sanitize(el('su').value);
+    var plat=el('sp').value,tone=el('stn').value;
+    var g={instagram:'150-220 word body, 5-8 hashtags at end on a new line, emojis welcome, emotional and visual',linkedin:'120-180 words, professional, 3-5 hashtags, focus on credibility and real-world impact',x:'Total including hashtags must be under 280 characters. Every character counts.',facebook:'100-180 words, conversational and community-focused, 3-4 hashtags, warm and accessible'};
+    return{
+      system:'You are a social media strategist for Gulf-region NGOs. You write posts that drive genuine engagement and inspire action. '+ln+' '+cx,
+      user:'Write a '+plat+' post:\n\nOrganisation: '+ngo+'\nContent: '+upd+'\nTone: '+tone+'\n\nPlatform requirements: '+g[plat]+'\n\nMust include: powerful opening hook, core message, clear call to action, hashtags including #GulfNGO and #Oman or #UAE. Make it shareable and authentic.'
+    };
+  }
+}
+
+function go(t){
+  el(t+'err').classList.remove('show');
+  if(!validate(t))return;
+  var btns={g:'bgb',d:'bdb',s:'bsb'};
+  var btn=el(btns[t]);
+  btn.disabled=true;showState(t,'l');
+  var st=Date.now();
+  callAPI(buildPrompt(t),t,btn,st,0);
+}
+
+function callAPI(prompt,t,btn,st,attempt){
+  fetch('/api/generate',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({system:prompt.system,user:prompt.user})
+  })
+  .then(function(r){
+    if(r.status===429&&attempt<2){setTimeout(function(){callAPI(prompt,t,btn,st,attempt+1);},2000*(attempt+1));return null;}
+    if(!r.ok)throw new Error('Server error '+r.status);
+    return r.json();
+  })
+  .then(function(data){
+    if(!data)return;
+    if(data.error)throw new Error(data.error);
+    var elapsed=((Date.now()-st)/1000).toFixed(1);
+    var cost=data.tokens?(data.tokens/1000*0.005).toFixed(4):null;
+    var text=data.text;
+    var te=el('rt'+t);
+    te.textContent=text;
+    te.setAttribute('dir',lang==='ar'?'rtl':'ltr');
+    el('meta-'+t).textContent=elapsed+'s'+(cost?' · ~$'+cost:'');
+    showState(t,'r');
+    el('or'+t).querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});
+    addHist(t,text);
+  })
+  .catch(function(err){
+    showState(t,'e');
+    var eb=el(t+'err');
+    eb.textContent=T[lang].errS+' ('+err.message+')';
+    eb.classList.add('show');
+  })
+  .finally(function(){btn.disabled=false;});
+}
+
+function fbk(btn,t,dir){
+  btn.closest('.rh-l').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  fbLog.push({type:t,dir:dir,ts:new Date().toISOString()});
+}
+
+function cpOut(tid,bid){
+  var text=el(tid).textContent;if(!text)return;
+  var t=T[lang];var b=el(bid);
+  navigator.clipboard.writeText(text).then(function(){
+    b.textContent=t.copied;b.classList.add('cp');
+    setTimeout(function(){b.textContent=t.copy;b.classList.remove('cp');},2000);
+  });
+}
+
+function dlDoc(tid,fname){
+  var text=el(tid).textContent;if(!text)return;
+  var title=fname.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Calibri,sans-serif;font-size:12pt;line-height:1.7;margin:2.5cm;}h1{color:#1A3D2B;font-size:15pt;margin-bottom:16pt;}div{white-space:pre-wrap;}</style></head><body><h1>GulfGrant AI — '+title+'</h1><div>'+text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>')+'</div><p style="margin-top:24pt;color:#999;font-size:9pt;">Generated by GulfGrant AI — gulfgrant-ai.vercel.app</p></body></html>';
+  var blob=new Blob([h],{type:'application/msword'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='GulfGrant-'+fname+'-'+new Date().toISOString().slice(0,10)+'.doc';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+function addHist(t,text){
+  var labels={g:'Grant Proposal',d:'Donor Email',s:'Social Post'};
+  hist.unshift({t:t,label:labels[t],text:text});
+  if(hist.length>MAX_H)hist.pop();
+  renderHist();
+}
+function renderHist(){
+  var wrap=el('hist-wrap'),grid=el('hist-grid');
+  if(!hist.length){wrap.classList.remove('show');return;}
+  wrap.classList.add('show');grid.innerHTML='';
+  hist.forEach(function(item){
+    var div=document.createElement('div');div.className='hist-item';
+    div.innerHTML='<div class="hist-item-type">'+item.label+'</div><div class="hist-item-preview">'+item.text.slice(0,120).replace(/</g,'').replace(/>/g,'')+'...</div>';
+    div.onclick=function(){
+      var ids={g:'rtg',d:'rtd',s:'rts'};
+      var tab={g:'g',d:'d',s:'s'}[item.t];
+      el(ids[item.t]).textContent=item.text;
+      switchTab(tab);showState(item.t,'r');
+    };
+    grid.appendChild(div);
+  });
+}
+function clearHist(){hist=[];el('hist-wrap').classList.remove('show');}
+
+function saveProfile(t){
+  var nf={g:'gn',d:'dn',s:'sn'}[t];
+  var mf=t==='g'?'gc':null;
+  var ne=el(nf);if(!ne||!ne.value.trim())return;
+  var p={name:ne.value.trim()};
+  if(mf&&el(mf))p.mission=el(mf).value.trim();
+  try{localStorage.setItem('gg_profile',JSON.stringify(p));}catch(e){}
+  updateProfBar(p);
+  alert(T[lang].pSaved);
+}
+function loadProfile(){try{var p=localStorage.getItem('gg_profile');return p?JSON.parse(p):null;}catch(e){return null;}}
+function updateProfBar(p){
+  if(!p||!p.name){el('profile-bar').classList.remove('show');return;}
+  el('pb-name').textContent=p.name;
+  el('profile-bar').classList.add('show');
+  ['gn','dn','sn'].forEach(function(id){var f=el(id);if(f&&!f.value)f.value=p.name;});
+  if(p.mission){var gc=el('gc');if(gc&&!gc.value)gc.value=p.mission;}
+}
+function clearProfile(){try{localStorage.removeItem('gg_profile');}catch(e){}el('profile-bar').classList.remove('show');}
+
+(function init(){
+  var p=loadProfile();if(p)updateProfBar(p);
+  setLang('en');
+})();
 </script>
 </body>
 </html>
