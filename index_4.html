@@ -442,6 +442,107 @@ input:focus,textarea:focus,select:focus{
 }
 
 /* ── FOOTER ──────────────────────────────── */
+/* ── SCORE BUTTON ── */
+.btn-score{
+  background:linear-gradient(135deg,var(--gold) 0%,#8B6508 100%);
+  color:#fff;border:none;border-radius:5px;
+  padding:4px 10px;font-size:.76rem;font-weight:600;
+  cursor:pointer;font-family:inherit;
+  white-space:nowrap;transition:opacity .15s;
+}
+.btn-score:hover{opacity:.88}
+.btn-score:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── SCORE MODAL ── */
+.score-overlay{
+  position:fixed;inset:0;
+  background:rgba(15,31,20,0.6);
+  z-index:300;display:none;
+  align-items:center;justify-content:center;
+}
+.score-overlay.open{display:flex}
+.score-modal{
+  background:var(--paper);
+  border-radius:14px;
+  width:520px;max-width:92vw;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  overflow:hidden;
+}
+.score-modal-hd{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:16px 20px;
+  background:var(--forest);
+  color:#fff;
+}
+.score-modal-hd span{
+  font-family:'Playfair Display',serif;
+  font-size:1rem;font-weight:700;
+}
+.score-close{
+  background:transparent;border:none;
+  color:rgba(255,255,255,0.6);font-size:1rem;
+  cursor:pointer;padding:2px 6px;
+  transition:color .15s;
+}
+.score-close:hover{color:#fff}
+.score-loading{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:12px;padding:3rem;color:var(--muted);
+  font-size:.88rem;
+}
+.score-result{padding:1.5rem}
+.score-number-wrap{
+  display:flex;align-items:baseline;
+  gap:8px;margin-bottom:1.25rem;
+}
+.score-number{
+  font-family:'Playfair Display',serif;
+  font-size:3.5rem;font-weight:800;
+  color:var(--teal);line-height:1;
+}
+.score-label{color:var(--muted);font-size:.88rem}
+.score-breakdown{
+  display:flex;flex-direction:column;gap:10px;
+  margin-bottom:1.25rem;
+}
+.score-row{display:flex;align-items:center;gap:10px}
+.score-row-label{
+  font-size:.8rem;font-weight:600;
+  color:var(--muted);text-transform:uppercase;
+  letter-spacing:.05em;width:140px;flex-shrink:0;
+}
+.score-bar-track{
+  flex:1;height:7px;
+  background:var(--sand);border-radius:4px;
+  overflow:hidden;
+}
+.score-bar-fill{
+  height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--teal) 0%,var(--teal-dk) 100%);
+  transition:width .6s ease;
+}
+.score-row-val{
+  font-size:.82rem;font-weight:700;
+  color:var(--forest);width:28px;text-align:right;
+}
+.score-tips{
+  background:var(--cream);border-radius:8px;
+  padding:12px 14px;
+  border-left:3px solid var(--gold);
+}
+.score-tips-title{
+  font-size:.76rem;font-weight:700;
+  color:var(--gold);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:8px;
+}
+.score-tip{
+  font-size:.82rem;color:var(--muted);
+  line-height:1.5;margin-bottom:5px;
+}
+.score-tip:last-child{margin-bottom:0}
+
 footer{
   background:var(--forest);
   padding:1.5rem 0;
@@ -462,6 +563,9 @@ body.rtl .fc-top,body.rtl .pb-inner,body.rtl .hist-hd{
 body.rtl label,body.rtl .fd,body.rtl .fc h2{text-align:right}
 body.rtl .char-wrap{justify-content:flex-start}
 body.rtl .tone-preview{border-left:none;border-right:3px solid var(--teal);border-radius:6px 0 0 6px}
+body.rtl .score-row{flex-direction:row-reverse}
+body.rtl .score-row-label{text-align:right}
+body.rtl .score-tips{border-left:none;border-right:3px solid var(--gold)}
 </style>
 </head>
 <body>
@@ -524,6 +628,7 @@ body.rtl .tone-preview{border-left:none;border-right:3px solid var(--teal);borde
     <button class="tab on" id="tg" onclick="switchTab('g')"><span id="tlg">Grant Writing</span></button>
     <button class="tab"    id="td" onclick="switchTab('d')"><span id="tld">Donor Email</span></button>
     <button class="tab"    id="ts" onclick="switchTab('s')"><span id="tls">Social Media</span></button>
+    <button class="tab"    id="tf" onclick="switchTab('f')"><span id="tlf">Find Funders</span></button>
   </div>
 
   <!-- ── GRANT ── -->
@@ -602,6 +707,7 @@ body.rtl .tone-preview{border-left:none;border-right:3px solid var(--teal);borde
               <button class="fb fb-dn" onclick="fbk(this,'g','dn')">👎</button>
             </div>
             <div class="rh-r">
+              <button class="btn-score" onclick="scoreOutput()" id="btn-score">Score this</button>
               <button class="btn-dl" onclick="dlDoc('rtg','grant')" id="dlg">Download</button>
               <button class="btn-regen" onclick="go('g')" id="rgg">Regenerate</button>
               <button class="bc" id="bcg" onclick="cpOut('rtg','bcg')">Copy</button>
@@ -766,6 +872,103 @@ body.rtl .tone-preview{border-left:none;border-right:3px solid var(--teal);borde
     </div>
   </div>
 
+  <!-- ── FUNDER MATCHING ── -->
+  <div class="panel" id="pf">
+    <div class="grid">
+      <div class="fc">
+        <div class="fc-top">
+          <div>
+            <h2 id="fh">Gulf Funder Matching</h2>
+            <p class="fd" id="fd2">Enter your cause and we'll match you with real Gulf funders who support it.</p>
+          </div>
+        </div>
+        <div class="field">
+          <label id="lf1">Organisation name</label>
+          <input type="text" id="fn" placeholder="e.g. Oman Youth Welfare Society"/>
+          <span class="field-err" id="fn-e">Required.</span>
+        </div>
+        <div class="field">
+          <label id="lf2">Your cause or mission</label>
+          <textarea id="fc2" rows="3" placeholder="e.g. Vocational training for underprivileged youth in Muscat" oninput="cc(this,'fc-c')"></textarea>
+          <div class="char-wrap"><span class="char-count" id="fc-c">0 / 300</span></div>
+          <span class="field-err" id="fc2-e">Required.</span>
+        </div>
+        <div class="field">
+          <label id="lf3">Focus area</label>
+          <select id="fcat">
+            <option value="education">Education & Youth</option>
+            <option value="environment">Environment & Sustainability</option>
+            <option value="health">Health & Wellbeing</option>
+            <option value="women">Women Empowerment</option>
+            <option value="community">Community Development</option>
+            <option value="arts">Arts & Heritage</option>
+            <option value="disability">Disability & Inclusion</option>
+            <option value="poverty">Poverty Alleviation</option>
+          </select>
+        </div>
+        <div class="field">
+          <label id="lf4">Country</label>
+          <select id="fcountry">
+            <option value="Oman">Oman</option>
+            <option value="UAE">UAE</option>
+            <option value="Saudi Arabia">Saudi Arabia</option>
+            <option value="Qatar">Qatar</option>
+            <option value="Kuwait">Kuwait</option>
+            <option value="Bahrain">Bahrain</option>
+          </select>
+        </div>
+        <button class="btn-gen" id="bfb" onclick="go('f')"><span id="bfl">Find Matching Funders</span></button>
+        <div class="err-banner" id="ferr"></div>
+      </div>
+      <div class="oc">
+        <div class="oe" id="oef">
+          <div class="oe-icon">🔍</div>
+          <p id="epf">Matching funders will appear here.</p>
+          <span class="oe-hint" id="hntf">Fill in your details and click Find</span>
+        </div>
+        <div class="ol" id="olf">
+          <div class="spin"></div>
+          <p id="lpf">Searching Gulf funders...</p>
+          <div class="pbar-track"><div class="pbar-fill"></div></div>
+        </div>
+        <div class="or" id="orf">
+          <div class="rh">
+            <div class="rh-l">
+              <span class="rl" id="rlf">Matched Funders</span>
+              <span class="meta-tag" id="meta-f"></span>
+            </div>
+            <div class="rh-r">
+              <button class="bc" id="bcf" onclick="cpOut('rtf','bcf')">Copy</button>
+            </div>
+          </div>
+          <div class="rt" id="rtf"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORE MODAL -->
+  <div class="score-overlay" id="score-overlay">
+    <div class="score-modal">
+      <div class="score-modal-hd">
+        <span id="score-title">Proposal Quality Score</span>
+        <button class="score-close" onclick="closeScore()">✕</button>
+      </div>
+      <div class="score-loading" id="score-loading">
+        <div class="spin"></div>
+        <p>Analysing your proposal...</p>
+      </div>
+      <div class="score-result" id="score-result" style="display:none">
+        <div class="score-number-wrap">
+          <div class="score-number" id="score-number">--</div>
+          <div class="score-label" id="score-label">out of 10</div>
+        </div>
+        <div class="score-breakdown" id="score-breakdown"></div>
+        <div class="score-tips" id="score-tips"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- HISTORY -->
   <div class="history-section" id="hist-wrap">
     <div class="hist-hd">
@@ -810,6 +1013,16 @@ var T={
     usingP:'Using saved profile:',pSaved:'Profile saved.',
     errF:'Please fill in all required fields.',errS:'Something went wrong. Please try again.',
     ft:'GulfGrant AI \u2014 Supporting civil society across the Gulf \u2014 2026',
+    tlf:'Find Funders',
+    fh:'Gulf Funder Matching',
+    fd2:"Enter your cause and we'll match you with real Gulf funders who support it.",
+    lf1:'Organisation name',lf2:'Your cause or mission',lf3:'Focus area',lf4:'Country',
+    bfl:'Find Matching Funders',
+    epf:'Matching funders will appear here.',
+    hntf:'Fill in your details and click Find',
+    lpf:'Searching Gulf funders...',
+    rlf:'Matched Funders',
+    scoreTitle:'Proposal Quality Score',
     tones:{
       formal:'Formal and professional \u2014 structured, objective language suited to government and corporate funders.',
       warm:'Warm and community-focused \u2014 personal, caring language that builds genuine human connection.',
@@ -841,6 +1054,16 @@ var T={
     usingP:'\u0645\u0644\u0641 \u0634\u062e\u0635\u064a \u0645\u062d\u0641\u0648\u0638:',pSaved:'\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062e\u0635\u064a.',
     errF:'\u064a\u0631\u062c\u0649 \u0645\u0644\u0621 \u062c\u0645\u064a\u0639 \u0627\u0644\u062d\u0642\u0648\u0644.',errS:'\u062d\u062f\u062b \u062e\u0637\u0623. \u062d\u0627\u0648\u0644 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649.',
     ft:'GulfGrant AI \u2014 \u062f\u0639\u0645 \u0627\u0644\u0645\u062c\u062a\u0645\u0639 \u0627\u0644\u0645\u062f\u0646\u064a \u0639\u0628\u0631 \u0627\u0644\u062e\u0644\u064a\u062c \u2014 2026',
+    tlf:'\u0627\u0628\u062d\u062b \u0639\u0646 \u062c\u0647\u0627\u062a \u062a\u0645\u0648\u064a\u0644',
+    fh:'\u0645\u0637\u0627\u0628\u0642\u0629 \u062c\u0647\u0627\u062a \u0627\u0644\u062a\u0645\u0648\u064a\u0644 \u0641\u064a \u0627\u0644\u062e\u0644\u064a\u062c',
+    fd2:'\u0623\u062f\u062e\u0644 \u062a\u0641\u0627\u0635\u064a\u0644 \u0645\u0646\u0638\u0645\u062a\u0643 \u0648\u0633\u0646\u0637\u0627\u0628\u0642\u0643 \u0645\u0639 \u062c\u0647\u0627\u062a \u062a\u0645\u0648\u064a\u0644 \u062e\u0644\u064a\u062c\u064a\u0629 \u062d\u0642\u064a\u0642\u064a\u0629.',
+    lf1:'\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u0638\u0645\u0629',lf2:'\u0642\u0636\u064a\u062a\u0643 \u0623\u0648 \u0631\u0633\u0627\u0644\u062a\u0643',lf3:'\u0645\u062c\u0627\u0644 \u0627\u0644\u062a\u0631\u0643\u064a\u0632',lf4:'\u0627\u0644\u062f\u0648\u0644\u0629',
+    bfl:'\u0627\u0628\u062d\u062b \u0639\u0646 \u062c\u0647\u0627\u062a \u062a\u0645\u0648\u064a\u0644 \u0645\u0646\u0627\u0633\u0628\u0629',
+    epf:'\u0633\u062a\u0638\u0647\u0631 \u062c\u0647\u0627\u062a \u0627\u0644\u062a\u0645\u0648\u064a\u0644 \u0627\u0644\u0645\u0637\u0627\u0628\u0642\u0629 \u0647\u0646\u0627.',
+    hntf:'\u0627\u0645\u0644\u0623 \u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u0648\u0627\u0636\u063a\u0637 \u0628\u062d\u062b',
+    lpf:'\u062c\u0627\u0631\u064d \u0627\u0644\u0628\u062d\u062b \u0639\u0646 \u062c\u0647\u0627\u062a \u0627\u0644\u062a\u0645\u0648\u064a\u0644...',
+    rlf:'\u062c\u0647\u0627\u062a \u0627\u0644\u062a\u0645\u0648\u064a\u0644 \u0627\u0644\u0645\u0637\u0627\u0628\u0642\u0629',
+    scoreTitle:'\u062a\u0642\u064a\u064a\u0645 \u062c\u0648\u062f\u0629 \u0627\u0644\u0645\u0642\u062a\u0631\u062d',
     tones:{
       formal:'\u0631\u0633\u0645\u064a \u0648\u0627\u062d\u062a\u0631\u0627\u0641\u064a \u2014 \u0644\u063a\u0629 \u0645\u0646\u0638\u0645\u0629 \u0648\u0645\u0648\u0636\u0648\u0639\u064a\u0629 \u0645\u0646\u0627\u0633\u0628\u0629 \u0644\u0644\u062c\u0647\u0627\u062a \u0627\u0644\u062d\u0643\u0648\u0645\u064a\u0629 \u0648\u0627\u0644\u0634\u0631\u0643\u0627\u062a.',
       warm:'\u062f\u0627\u0641\u0626 \u0648\u0645\u062c\u062a\u0645\u0639\u064a \u2014 \u0644\u063a\u0629 \u0634\u062e\u0635\u064a\u0629 \u0648\u062d\u0627\u0646\u064a\u0629 \u062a\u0628\u0646\u064a \u062a\u0648\u0627\u0635\u0644\u0627\u064b \u0625\u0646\u0633\u0627\u0646\u064a\u0627\u064b \u062d\u0642\u064a\u0642\u064a\u0627\u064b.',
@@ -866,6 +1089,14 @@ function setLang(l){
   setHTML('hero-h1',t.heroH1); setHTML('hero-p',t.heroP);
   setHTML('hp1',t.hp1);setHTML('hp2',t.hp2);setHTML('hp3',t.hp3);setHTML('hp4',t.hp4);
   setHTML('tlg',t.tlg);setHTML('tld',t.tld);setHTML('tls',t.tls);
+  setHTML('tlf',t.tlf||'Find Funders');
+  setHTML('fh',t.fh);setHTML('fd2',t.fd2);
+  setHTML('lf1',t.lf1);setHTML('lf2',t.lf2);setHTML('lf3',t.lf3);setHTML('lf4',t.lf4);
+  setHTML('bfl',t.bfl);
+  setHTML('epf',t.epf);setHTML('hntf',t.hntf);
+  setHTML('lpf',t.lpf);setHTML('rlf',t.rlf);
+  // Score modal title
+  var stEl=el('score-title');if(stEl)stEl.textContent=t.scoreTitle||'Proposal Quality Score';
   setHTML('gh',t.gh);setHTML('gd',t.gd);
   setHTML('dh',t.dh);setHTML('dd',t.dd);
   setHTML('sh',t.sh);setHTML('sd',t.sd);
@@ -888,12 +1119,16 @@ function setLang(l){
     if(r)r.textContent=t.regen;
     if(b&&!b.classList.contains('cp'))b.textContent=t.copy;
   });
+  var bcf=el('bcf');if(bcf&&!bcf.classList.contains('cp'))bcf.textContent=t.copy;
+  // Funder tab placeholders
+  var fnEl=el('fn');if(fnEl)fnEl.placeholder=l==='ar'?'\u0645\u062b\u0627\u0644: \u062c\u0645\u0639\u064a\u0629 \u0631\u0639\u0627\u064a\u0629 \u0634\u0628\u0627\u0628 \u0639\u0645\u0627\u0646':'e.g. Oman Youth Welfare Society';
+  var fc2El=el('fc2');if(fc2El)fc2El.placeholder=l==='ar'?'\u0645\u062b\u0627\u0644: \u0627\u0644\u062a\u062f\u0631\u064a\u0628 \u0627\u0644\u0645\u0647\u0646\u064a \u0644\u0644\u0634\u0628\u0627\u0628 \u0641\u064a \u0645\u0633\u0642\u0637':'e.g. Vocational training for underprivileged youth in Muscat';
   var pf=loadProfile();
   if(pf){el('pb-text').innerHTML=t.usingP+' <strong>'+pf.name+'</strong>';}
 }
 
 function switchTab(n){
-  ['g','d','s'].forEach(function(x){
+  ['g','d','s','f'].forEach(function(x){
     el('t'+x).classList.toggle('on',x===n);
     el('p'+x).classList.toggle('on',x===n);
   });
@@ -978,14 +1213,158 @@ function buildPrompt(t){
   }
 }
 
+// ── GULF FUNDERS DATABASE ─────────────────
+var FUNDERS = [
+  {name:"Mohammed Bin Rashid Al Maktoum Foundation",country:"UAE",focus:["education","community","arts"],size:"AED 50K–2M",url:"mbrfoundation.ae",desc:"Focuses on knowledge and education across the Arab world."},
+  {name:"Khalifa Fund for Enterprise Development",country:"UAE",focus:["community","education"],size:"AED 100K–5M",url:"khalifafund.ae",desc:"Supports SMEs and community development projects in the UAE."},
+  {name:"Community Development Authority Dubai",country:"UAE",focus:["community","disability","poverty"],size:"AED 20K–500K",url:"cda.gov.ae",desc:"Dubai government body funding social welfare and community NGOs."},
+  {name:"Abu Dhabi Social Support Authority",country:"UAE",focus:["poverty","disability","health"],size:"AED 50K–1M",url:"ssa.gov.ae",desc:"Provides financial and social support programs in Abu Dhabi."},
+  {name:"Emirates Foundation",country:"UAE",focus:["education","youth","community"],size:"AED 100K–2M",url:"emiratesfoundation.ae",desc:"Invests in youth development and social innovation across the UAE."},
+  {name:"Sharjah Charity International",country:"UAE",focus:["poverty","health","education"],size:"AED 10K–200K",url:"sharjahcharity.org",desc:"Humanitarian and development programs globally with Gulf focus."},
+  {name:"PDO (Petroleum Development Oman) Social Investment",country:"Oman",focus:["education","community","environment"],size:"OMR 5K–100K",url:"pdo.co.om",desc:"PDO's community investment program for Omani NGOs."},
+  {name:"Oman Oil & Gas CSR Fund",country:"Oman",focus:["community","education","environment"],size:"OMR 10K–250K",url:"omanoil.com",desc:"CSR grants for Omani civil society from energy sector."},
+  {name:"Bank Muscat Al Wathbah Fund",country:"Oman",focus:["education","youth","women"],size:"OMR 5K–50K",url:"bankmuscat.com",desc:"Social investment arm of Bank Muscat supporting Omani NGOs."},
+  {name:"Oman Charitable Organisation",country:"Oman",focus:["poverty","health","education"],size:"OMR 1K–30K",url:"ocharitable.org",desc:"Supports social welfare and humanitarian causes across Oman."},
+  {name:"Diwan of Royal Court Grant Program",country:"Oman",focus:["community","arts","education"],size:"OMR 10K–500K",url:"diwan.gov.om",desc:"Royal patronage grants for cultural and community initiatives."},
+  {name:"Qatar Foundation Community Grants",country:"Qatar",focus:["education","community","health"],size:"QAR 50K–1M",url:"qf.org.qa",desc:"Funds education, science, and community development in Qatar."},
+  {name:"Qatar Charity",country:"Qatar",focus:["poverty","health","education"],size:"QAR 20K–500K",url:"qcharity.org",desc:"Humanitarian and development NGO with Gulf and global reach."},
+  {name:"Kuwait Awqaf Public Foundation",country:"Kuwait",focus:["education","community","arts"],size:"KWD 5K–100K",url:"awqaf.org.kw",desc:"Endowment-based grants for social and cultural initiatives."},
+  {name:"Kuwait Fund for Arab Economic Development",country:"Kuwait",focus:["community","education","health"],size:"KWD 50K–5M",url:"kuwait-fund.org",desc:"Development funding for Arab civil society and social projects."},
+  {name:"Bahrain Endowment Authority (Waqf Fund)",country:"Bahrain",focus:["education","community","arts"],size:"BHD 5K–50K",url:"waqf.gov.bh",desc:"Grants for education, culture, and social welfare in Bahrain."},
+  {name:"Islamic Development Bank — Social Fund",country:"All Gulf",focus:["poverty","health","education","community"],size:"USD 50K–2M",url:"isdb.org",desc:"Multilateral development bank funding Islamic social projects."},
+  {name:"HSBC Middle East Foundation",country:"UAE",focus:["environment","education","community"],size:"USD 20K–200K",url:"hsbc.com/sustainability",desc:"Environmental and social impact grants across the Middle East."},
+  {name:"Shell Oman Community Investment",country:"Oman",focus:["environment","education","community"],size:"OMR 5K–80K",url:"shell.com.om",desc:"Shell Oman's annual CSR grants for community NGOs."},
+  {name:"Etisalat (e&) Foundation UAE",country:"UAE",focus:["education","disability","community"],size:"AED 20K–300K",url:"efoundation.ae",desc:"Telecom group's social responsibility grants for UAE NGOs."},
+  {name:"Dubai Cares",country:"UAE",focus:["education","youth","poverty"],size:"AED 100K–5M",url:"dubaicares.ae",desc:"Focuses on access to quality education for children globally."},
+  {name:"Zakat Fund UAE",country:"UAE",focus:["poverty","health","disability"],size:"AED 5K–100K",url:"zakatfund.gov.ae",desc:"Islamic social welfare fund for eligible UAE causes."},
+  {name:"Gulf International Bank Foundation",country:"All Gulf",focus:["education","women","community"],size:"USD 10K–100K",url:"gibbonline.com",desc:"GIB's CSR arm supporting education and women empowerment."},
+  {name:"Saudi Aramco Sustainability Program",country:"Saudi Arabia",focus:["environment","education","community"],size:"SAR 50K–1M",url:"saudiaramco.com",desc:"Aramco's social investment for Saudi and Gulf NGOs."},
+  {name:"Abdul Latif Jameel Community Initiatives",country:"Saudi Arabia",focus:["poverty","education","environment"],size:"SAR 20K–500K",url:"aljgroup.com",desc:"Long-running Gulf philanthropy program across multiple sectors."},
+];
+
+function buildFunderPrompt(name, cause, category, country) {
+  var funderList = FUNDERS.filter(function(f){
+    return f.country === country || f.country === 'All Gulf';
+  });
+  if (funderList.length < 8) funderList = FUNDERS;
+  var funderText = funderList.map(function(f,i){
+    return (i+1)+'. '+f.name+' | Country: '+f.country+' | Focus: '+f.focus.join(', ')+' | Typical grant: '+f.size+' | '+f.desc;
+  }).join('\n');
+  return {
+    system: 'You are an expert Gulf NGO funding advisor with deep knowledge of grant-making organisations across Oman, UAE, Saudi Arabia, Qatar, Kuwait, and Bahrain. You help NGOs identify the best funding matches for their cause. Always respond in clear, professional English.',
+    user: 'An NGO needs funding. Here are their details:\n\nOrganisation: '+name+'\nCause: '+cause+'\nFocus area: '+category+'\nCountry: '+country+'\n\nHere is the database of Gulf funders:\n\n'+funderText+'\n\nIdentify the TOP 5 most relevant funders from this list for this NGO. For each funder output:\n\n**[Funder Name]**\nWhy it matches: [2 sentences specific to this NGO\'s cause]\nTypical grant size: [size]\nWebsite: [url]\nMatch strength: [Strong / Good / Moderate]\n\nBe specific about why each funder matches. Do not recommend funders that clearly do not match the focus area.'
+  };
+}
+
+// ── SCORE ─────────────────────────────────
+function scoreOutput() {
+  var text = el('rtg').textContent;
+  if (!text || text.length < 100) return;
+  var btn = el('btn-score');
+  btn.disabled = true;
+  el('score-overlay').classList.add('open');
+  el('score-loading').style.display = 'flex';
+  el('score-result').style.display = 'none';
+
+  var scorePrompt = {
+    system: 'You are an expert grant evaluator who has reviewed thousands of NGO grant proposals. You score proposals objectively and give specific, actionable feedback. Always respond with valid JSON only — no markdown, no preamble.',
+    user: 'Score this grant proposal on these 5 criteria, each out of 10:\n1. Clarity — is the problem and solution clearly explained?\n2. Specificity — are there concrete details, numbers, and targets?\n3. Impact — is the expected impact on beneficiaries compelling?\n4. Budget Justification — does the budget section feel credible and justified?\n5. Cultural Fit — is the language and approach appropriate for Gulf funders?\n\nProposal:\n"""\n'+text.slice(0,3000)+'\n"""\n\nRespond with this exact JSON structure:\n{"clarity":7,"specificity":6,"impact":8,"budget":5,"cultural":9,"overall":7,"tips":["tip 1","tip 2","tip 3"]}'
+  };
+
+  fetch('/api/generate', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({system:scorePrompt.system, user:scorePrompt.user})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if (data.error) throw new Error(data.error);
+    var text = data.text.trim().replace(/```json|```/g,'').trim();
+    var scores = JSON.parse(text);
+    renderScore(scores);
+  })
+  .catch(function(err){
+    el('score-loading').style.display='none';
+    el('score-result').innerHTML='<p style="color:var(--red);padding:1rem">Could not score — please try again.</p>';
+    el('score-result').style.display='block';
+  })
+  .finally(function(){ btn.disabled = false; });
+}
+
+function renderScore(s){
+  el('score-loading').style.display='none';
+  el('score-number').textContent = s.overall;
+  var color = s.overall>=8?'var(--teal)':s.overall>=6?'var(--gold)':'var(--red)';
+  el('score-number').style.color = color;
+
+  var criteria = [
+    {key:'clarity',label:'Clarity'},
+    {key:'specificity',label:'Specificity'},
+    {key:'impact',label:'Impact'},
+    {key:'budget',label:'Budget'},
+    {key:'cultural',label:'Cultural Fit'},
+  ];
+  var bd = el('score-breakdown');
+  bd.innerHTML = '';
+  criteria.forEach(function(c){
+    var val = s[c.key]||0;
+    var pct = (val/10)*100;
+    var barColor = val>=8?'var(--teal)':val>=6?'var(--gold)':'var(--red)';
+    bd.innerHTML += '<div class="score-row">' +
+      '<span class="score-row-label">'+c.label+'</span>' +
+      '<div class="score-bar-track"><div class="score-bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div>' +
+      '<span class="score-row-val">'+val+'/10</span>' +
+    '</div>';
+  });
+
+  var tips = el('score-tips');
+  var tipHtml = '<div class="score-tips-title">Improvement Tips</div>';
+  (s.tips||[]).forEach(function(t){
+    tipHtml += '<div class="score-tip">→ '+t+'</div>';
+  });
+  tips.innerHTML = tipHtml;
+  el('score-result').style.display = 'block';
+}
+
+function closeScore(){
+  el('score-overlay').classList.remove('open');
+}
+el('score-overlay').addEventListener('click',function(e){
+  if(e.target===el('score-overlay'))closeScore();
+});
+
 function go(t){
   el(t+'err').classList.remove('show');
-  if(!validate(t))return;
-  var btns={g:'bgb',d:'bdb',s:'bsb'};
+  var flds = {g:['gn','gc','ga','gf'],d:['dn','dc'],s:['sn','su'],f:['fn','fc2']};
+  var ok=true;
+  (flds[t]||[]).forEach(function(id){
+    var inp=el(id),err=el(id+'-e');
+    if(!inp||!inp.value.trim()){
+      if(inp)inp.classList.add('input-err');
+      if(err)err.classList.add('show-err');
+      ok=false;
+    } else {
+      if(inp)inp.classList.remove('input-err');
+      if(err)err.classList.remove('show-err');
+    }
+  });
+  if(!ok)return;
+  var btns={g:'bgb',d:'bdb',s:'bsb',f:'bfb'};
   var btn=el(btns[t]);
   btn.disabled=true;showState(t,'l');
   var st=Date.now();
-  callAPI(buildPrompt(t),t,btn,st,0);
+  var prompt;
+  if(t==='f'){
+    prompt=buildFunderPrompt(
+      sanitize(el('fn').value),
+      sanitize(el('fc2').value),
+      el('fcat').value,
+      el('fcountry').value
+    );
+  } else {
+    prompt=buildPrompt(t);
+  }
+  callAPI(prompt,t,btn,st,0);
 }
 
 function callAPI(prompt,t,btn,st,attempt){
@@ -1010,8 +1389,10 @@ function callAPI(prompt,t,btn,st,attempt){
     te.setAttribute('dir',lang==='ar'?'rtl':'ltr');
     el('meta-'+t).textContent=elapsed+'s'+(cost?' · ~$'+cost:'');
     showState(t,'r');
-    el('or'+t).querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});
-    addHist(t,text);
+    if(t!=='f'){
+      el('or'+t).querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});
+      addHist(t,text);
+    }
   })
   .catch(function(err){
     showState(t,'e');
